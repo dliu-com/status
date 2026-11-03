@@ -28,7 +28,7 @@
       "name": "dliu.com",
       "url": "https://dliu.com/",
       "docs": "https://dliu.com/docs#health",
-      "health": true,
+      "health": false,
       "functions": [
         {
           "key": "pages",

@@ -74,8 +74,11 @@ function parse(markdown, host) {
       break; // a check listed for several functions (e.g. "game, rules" on /health) runs once, under the first
     }
   }
-  const healthSection = markdown.slice(markdown.search(/^##\s+Health endpoint/mi));
-  const health = /GET\s+`?https:\/\/[^\s`]+\/health`?/i.test(healthSection.split(/\n##\s/)[0]);
+  const start = markdown.search(/^##\s+Health endpoint/mi);
+  const healthSection = start < 0 ? '' : markdown.slice(start).split(/\n##\s/)[0].replace(/^##[^\n]*\n/, '');
+  // "None." or "There is no /health endpoint" means no backend, even if the text goes on to mention the URL.
+  const none = /^\s*(none\b|there is (\*\*)?no\b|no\s+`?\/health)/i.test(healthSection);
+  const health = !none && /GET\s+`?https:\/\/[^\s`]+\/health`?/i.test(healthSection);
   // /health itself is read by the checker when health is true, so it isn't also a guest check.
   for (const fn of functions) fn.checks = fn.checks.filter((c) => !(health && new URL(c.url).pathname === '/health'));
   return { health, functions };

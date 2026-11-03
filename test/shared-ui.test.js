@@ -32,7 +32,7 @@ test('docs pages use the shared docs stylesheet and tabs', () => {
 
 test('the docs have Technical architecture, Every check, Cost, Security and Testing tabs', () => {
   const page = read('docs/index.html');
-  for (const [id, label] of [['architecture', 'Technical architecture'], ['checks', 'Every check'], ['cost', 'Cost'], ['security', 'Security'], ['health', 'Testing']]) {
+  for (const [id, label] of [['architecture', 'Architecture'], ['checks', 'Every check'], ['cost', 'Cost'], ['security', 'Security'], ['health', 'Testing']]) {
     expect(page).toContain(`<a href="/docs#${id}" data-tab="${id}"`);
     expect(page).toContain(`>${label}</a>`);
     expect(page).toContain(`id="${id}" data-section`);
@@ -40,13 +40,15 @@ test('the docs have Technical architecture, Every check, Cost, Security and Test
   expect(fs.existsSync(path.join(__dirname, '..', 'web', 'docs', 'health.html'))).toBe(false);
 });
 
-test('the testing tab has a diagram, folds its technical details and links the Markdown version', () => {
+test('the testing tab is for people: diagram, numbers and a table, no exact technical details, a link to the Markdown', () => {
   const full = read('docs/index.html');
-  const page = full.slice(full.indexOf('id="health" data-section'));
+  const start = full.indexOf('id="health" data-section');
+  const page = full.slice(start, full.indexOf('</article>', start));
   expect(page).toContain('class="dg-flow"');
-  expect(page).toMatch(/<details>\s*<summary>Technical details/);
-  expect(page).not.toMatch(/<details[^>]* open/);
-  expect(page).toContain('<a href="/docs/health.md">');
+  expect(page).toContain('class="dg-stats"');
+  expect(page).toContain('<table class="dl-table">');
+  expect(page).not.toMatch(/<details|<code|<pre|\b[1-5]\d\d\b(?! minutes)|application\/|text\/html|https?:\/\/(?!status)/);
+  expect(page).toContain('<a href="/docs/health.md">Technical version for machines (Markdown)</a>');
   const markdown = read('docs/health.md');
   for (const key of ['`pages`', '`checker`', 'https://status.dliu.com/data/status.json', 'generatedAt']) expect(markdown).toContain(key);
 });

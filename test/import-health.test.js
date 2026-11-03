@@ -37,3 +37,8 @@ test('turns a testing page into functions and checks', () => {
 test('a site without a backend has no health endpoint', () => {
   expect(parse(markdown.replace(/## Health endpoint[\s\S]*/, '## Health endpoint\n\nNone. No backend.\n'), 'a.dliu.com').health).toBe(false);
 });
+
+test('"None." under Health endpoint means no /health, even when the URL is mentioned', () => {
+  const text = markdown.replace(/## Health endpoint[\s\S]*/, '## Health endpoint\n\nNone. dliu.com has no backend. `GET https://a.dliu.com/health` returns `404`.\n');
+  expect(parse(text, 'a.dliu.com').health).toBe(false);
+});

@@ -69,3 +69,4 @@
 .dg-icon.icon-health { --dg: var(--dl-accent-hover); }
 .dg-icon.icon-data { --dg: var(--dl-ok); }
 .dg-icon.icon-result { --dg: var(--status-warn); }
+.dg .results { margin-top: 12px; gap: 8px; }
