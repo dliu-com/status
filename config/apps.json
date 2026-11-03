@@ -27,7 +27,7 @@
       "key": "root",
       "name": "dliu.com",
       "url": "https://dliu.com/",
-      "docs": "https://dliu.com/docs/health",
+      "docs": "https://dliu.com/docs#health",
       "health": false,
       "functions": [
         {
@@ -135,7 +135,7 @@
       "key": "video",
       "name": "DL video",
       "url": "https://video.dliu.com/",
-      "docs": "https://video.dliu.com/docs/health",
+      "docs": "https://video.dliu.com/docs#health",
       "health": true,
       "functions": [
         {
@@ -262,7 +262,7 @@
       "key": "blog",
       "name": "DL blog",
       "url": "https://blog.dliu.com/",
-      "docs": "https://blog.dliu.com/docs/health",
+      "docs": "https://blog.dliu.com/docs#health",
       "health": true,
       "functions": [
         {
@@ -368,7 +368,7 @@
       "key": "files",
       "name": "Files",
       "url": "https://files.dliu.com/",
-      "docs": "https://files.dliu.com/docs/health",
+      "docs": "https://files.dliu.com/docs#health",
       "health": true,
       "functions": [
         {
@@ -454,7 +454,7 @@
       "key": "share",
       "name": "DL Share",
       "url": "https://share.dliu.com/",
-      "docs": "https://share.dliu.com/docs/health",
+      "docs": "https://share.dliu.com/docs#health",
       "health": true,
       "functions": [
         {
@@ -576,7 +576,7 @@
       "key": "traffic",
       "name": "Traffic",
       "url": "https://traffic.dliu.com/",
-      "docs": "https://traffic.dliu.com/docs/health",
+      "docs": "https://traffic.dliu.com/docs#health",
       "health": true,
       "functions": [
         {
@@ -686,7 +686,7 @@
       "key": "plan",
       "name": "DL Travel Plan",
       "url": "https://plan.dliu.com/",
-      "docs": "https://plan.dliu.com/docs/health",
+      "docs": "https://plan.dliu.com/docs#health",
       "health": true,
       "functions": [
         {
@@ -809,7 +809,7 @@
       "key": "auth",
       "name": "DL auth",
       "url": "https://auth.dliu.com/",
-      "docs": "https://auth.dliu.com/docs/health",
+      "docs": "https://auth.dliu.com/docs#health",
       "health": false,
       "functions": [
         {
@@ -910,7 +910,7 @@
       "key": "jh",
       "name": "jh.dliu.com",
       "url": "https://jh.dliu.com/",
-      "docs": "https://jh.dliu.com/docs/health",
+      "docs": "https://jh.dliu.com/docs#health",
       "private": true,
       "health": true,
       "functions": [
@@ -1027,49 +1027,211 @@
       "key": "weiqi",
       "name": "DL Weiqi",
       "url": "https://weiqi.dliu.com/",
-      "docs": "https://weiqi.dliu.com/docs/health",
-      "health": false,
+      "docs": "https://weiqi.dliu.com/docs#health",
+      "health": true,
       "functions": [
         {
           "key": "pages",
-          "name": "Pages",
+          "name": "Pages (网页)",
           "checks": [
             {
               "url": "https://weiqi.dliu.com/",
               "expect": {
                 "status": 200,
-                "type": "text/html",
-                "contains": "dl-footer"
-              }
-            }
-          ]
-        },
-        {
-          "key": "games",
-          "name": "Game API",
-          "checks": [
+                "contains": "dl-header"
+              },
+              "slowMs": 2000
+            },
             {
-              "url": "https://weiqi.dliu.com/api/games",
+              "url": "https://weiqi.dliu.com/play",
               "expect": {
                 "status": 200,
-                "type": "application/json",
-                "json": "games"
+                "contains": "dl-header"
               },
-              "slowMs": 5000
-            }
-          ]
-        },
-        {
-          "key": "docs",
-          "name": "Docs",
-          "critical": false,
-          "checks": [
+              "slowMs": 2000
+            },
+            {
+              "url": "https://weiqi.dliu.com/record",
+              "expect": {
+                "status": 200,
+                "contains": "dl-header"
+              },
+              "slowMs": 2000
+            },
+            {
+              "url": "https://weiqi.dliu.com/guide",
+              "expect": {
+                "status": 200,
+                "contains": "dl-header"
+              },
+              "slowMs": 2000
+            },
             {
               "url": "https://weiqi.dliu.com/docs",
               "expect": {
                 "status": 200,
-                "type": "text/html"
+                "contains": "dl-header"
+              },
+              "slowMs": 2000
+            },
+            {
+              "url": "https://weiqi.dliu.com/docs/health",
+              "expect": {
+                "status": 200,
+                "contains": "dl-header"
+              },
+              "slowMs": 2000
+            },
+            {
+              "url": "https://weiqi.dliu.com/docs/health.md",
+              "expect": {
+                "status": 200,
+                "contains": "# DL Weiqi health checks"
+              },
+              "slowMs": 2000
+            },
+            {
+              "url": "https://weiqi.dliu.com/about",
+              "expect": {
+                "status": 301,
+                "location": "/docs"
               }
+            },
+            {
+              "url": "http://weiqi.dliu.com/",
+              "expect": {
+                "status": 301,
+                "location": "https://weiqi.dliu.com/"
+              }
+            }
+          ]
+        },
+        {
+          "key": "live-game",
+          "name": "Live game and shared draft (现场对局和共享草稿)",
+          "checks": [
+            {
+              "url": "https://weiqi.dliu.com/api/game",
+              "expect": {
+                "status": 200,
+                "contains": "\"state\""
+              },
+              "slowMs": 3000
+            },
+            {
+              "url": "https://weiqi.dliu.com/api/draft",
+              "expect": {
+                "status": 200,
+                "contains": "\"draft\""
+              },
+              "slowMs": 3000
+            },
+            {
+              "url": "https://weiqi.dliu.com/api/games",
+              "expect": {
+                "status": 200,
+                "contains": "\"games\""
+              },
+              "slowMs": 3000
+            }
+          ]
+        },
+        {
+          "key": "library",
+          "name": "Game library (棋谱库)",
+          "checks": [
+            {
+              "url": "https://weiqi.dliu.com/game",
+              "expect": {
+                "status": 200,
+                "contains": "dl-header"
+              },
+              "slowMs": 2000
+            },
+            {
+              "url": "https://weiqi.dliu.com/api/library",
+              "expect": {
+                "status": 200,
+                "contains": "\"games\""
+              },
+              "slowMs": 3000
+            },
+            {
+              "url": "https://weiqi.dliu.com/game/2026101001",
+              "expect": {
+                "status": 200,
+                "contains": "dl-header"
+              },
+              "slowMs": 2000
+            },
+            {
+              "url": "https://weiqi.dliu.com/api/library/2026101001",
+              "expect": {
+                "status": 200,
+                "contains": "\"metadata\""
+              },
+              "slowMs": 3000
+            }
+          ]
+        },
+        {
+          "key": "reports",
+          "name": "Game reports (棋局报告)",
+          "critical": false,
+          "checks": [
+            {
+              "url": "https://weiqi.dliu.com/game/2026101001/report",
+              "expect": {
+                "status": 200,
+                "contains": "dl-header"
+              },
+              "slowMs": 2000
+            },
+            {
+              "url": "https://weiqi.dliu.com/api/library/2026101001/report",
+              "expect": {
+                "status": 200,
+                "contains": "\"availableLanguages\""
+              },
+              "slowMs": 3000
+            },
+            {
+              "url": "https://weiqi.dliu.com/prepared-reports/2026101001/index.json",
+              "expect": {
+                "status": 200,
+                "contains": "\"id\""
+              },
+              "slowMs": 3000
+            }
+          ]
+        },
+        {
+          "key": "analysis",
+          "name": "AI game analysis (AI 棋局分析)",
+          "critical": false,
+          "checks": [
+            {
+              "url": "https://weiqi.dliu.com/api/library/2026101001",
+              "expect": {
+                "status": 200,
+                "contains": "\"analysis\""
+              },
+              "slowMs": 3000
+            }
+          ]
+        },
+        {
+          "key": "position",
+          "name": "Photo recognition and position analysis (照片识别和局面分析)",
+          "critical": false,
+          "checks": [
+            {
+              "url": "https://weiqi.dliu.com/analysis",
+              "expect": {
+                "status": 200,
+                "contains": "dl-header"
+              },
+              "slowMs": 2000
             }
           ]
         }
@@ -1079,7 +1241,7 @@
       "key": "xiangqi",
       "name": "DL Xiangqi",
       "url": "https://xiangqi.dliu.com/",
-      "docs": "https://xiangqi.dliu.com/docs/health",
+      "docs": "https://xiangqi.dliu.com/docs#health",
       "health": true,
       "functions": [
         {

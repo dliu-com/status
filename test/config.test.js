@@ -18,7 +18,7 @@ test('every site has a key, name, https URL, testing page and functions with che
     keys.add(app.key);
     expect(app.name).toBeTruthy();
     expect(app.url).toMatch(/^https:\/\/([a-z0-9-]+\.)?dliu\.com\/$/);
-    expect(app.docs).toBe(`${app.url}docs/health`);
+    expect(app.docs).toBe(`${app.url}docs#health`);
     expect(typeof app.health).toBe('boolean');
     expect(app.functions.length).toBeGreaterThan(0);
     for (const fn of app.functions) {

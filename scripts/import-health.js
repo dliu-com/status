@@ -68,6 +68,7 @@ function parse(markdown, host) {
     if (!empty(slow) && /\d/.test(slow)) check.slowMs = Number(slow.replace(/[^\d]/g, ''));
     for (const key of unquote(column(row, 'function')).split(/,\s*/).map(unquote)) {
       const fn = functions.find((f) => f.key === key);
+      if (!fn && new URL(check.url).pathname === '/health') break; // the checker reads /health itself
       if (!fn) throw new Error(`Guest check for unknown function "${key}"`);
       fn.checks.push(check);
       break; // a check listed for several functions (e.g. "game, rules" on /health) runs once, under the first

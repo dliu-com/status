@@ -5,7 +5,7 @@ const read = (file) => fs.readFileSync(path.join(__dirname, '..', 'web', file), 
 const DL_CSS = '<link rel="stylesheet" href="https://files.dliu.com/dliu.com/ui/v1/dl.css">';
 const DL_DOCS_CSS = '<link rel="stylesheet" href="https://files.dliu.com/dliu.com/ui/v1/dl-docs.css">';
 const DL_ICON = 'https://files.dliu.com/dliu.com/favicon.png';
-const PAGES = ['index.html', '404.html', 'docs/index.html', 'docs/health.html'];
+const PAGES = ['index.html', '404.html', 'docs/index.html'];
 
 test('every page loads the shared stylesheet before its own and has the shared header and footer', () => {
   for (const file of PAGES) {
@@ -22,7 +22,7 @@ test('every page loads the shared stylesheet before its own and has the shared h
 });
 
 test('docs pages use the shared docs stylesheet and tabs', () => {
-  for (const file of ['docs/index.html', 'docs/health.html']) {
+  for (const file of ['docs/index.html']) {
     const page = read(file);
     expect(page).toContain(DL_DOCS_CSS);
     expect(page).toContain('<main class="dl-main dl-docs-main">');
@@ -30,8 +30,19 @@ test('docs pages use the shared docs stylesheet and tabs', () => {
   }
 });
 
-test('the testing page has a diagram, folds its technical details and links the Markdown version', () => {
-  const page = read('docs/health.html');
+test('the docs have Technical architecture, Every check, Cost, Security and Testing tabs', () => {
+  const page = read('docs/index.html');
+  for (const [id, label] of [['architecture', 'Technical architecture'], ['checks', 'Every check'], ['cost', 'Cost'], ['security', 'Security'], ['health', 'Testing']]) {
+    expect(page).toContain(`<a href="/docs#${id}" data-tab="${id}"`);
+    expect(page).toContain(`>${label}</a>`);
+    expect(page).toContain(`id="${id}" data-section`);
+  }
+  expect(fs.existsSync(path.join(__dirname, '..', 'web', 'docs', 'health.html'))).toBe(false);
+});
+
+test('the testing tab has a diagram, folds its technical details and links the Markdown version', () => {
+  const full = read('docs/index.html');
+  const page = full.slice(full.indexOf('id="health" data-section'));
   expect(page).toContain('class="dg-flow"');
   expect(page).toMatch(/<details>\s*<summary>Technical details/);
   expect(page).not.toMatch(/<details[^>]* open/);

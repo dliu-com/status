@@ -5,8 +5,8 @@ which sites and which of their functions are up, degraded or down, with 90 days 
 
 - **Guest only.** The checker never signs in and has no AWS access to the other sites. It requests public URLs over HTTPS,
   without cookies, like any visitor, plus each site's public `/health` endpoint.
-- **Each site says how to test it.** Every site publishes `/docs/health` (for people: a diagram, technical details
-  folded) and `/docs/health.md` (for machines: every detail). `config/apps.json` here is written from those pages. The
+- **Each site says how to test it.** Every site publishes a Testing tab, `/docs#health` (for people: a diagram, technical details
+  folded), and `/docs/health.md` (for machines: every detail). `config/apps.json` here is written from those pages. The
   contract every site follows is [`HEALTH.md`](HEALTH.md).
 - **Not counted as traffic.** Every request uses the user agent `dliu-status-bot/1.0 (+https://status.dliu.com/docs)`,
   which traffic.dliu.com drops.
@@ -76,5 +76,5 @@ make outputs
 | `lambda/checker/evaluate.js` | Up/degraded/down rules, history, incidents, the public file |
 | `lambda/checker/index.js` | Lambda handler: reads state, runs checks, writes state and `data/status.json` |
 | `lib/status-stack.ts` | CDK: private buckets, checker + schedule, CloudFront, certificate, DNS |
-| `web/` | The status board, `/docs` (How it works, Every check, Cost) and this site's own `/docs/health` + `.md` |
+| `web/` | The status board, `/docs` (tabs: Technical architecture, Every check, Cost, Security, Testing) and `/docs/health.md` |
 | `HEALTH.md` | The testing contract every dliu.com site follows |

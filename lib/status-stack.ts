@@ -31,13 +31,15 @@ export const STATIC_CACHE_CONTROL = ['public', 'max-age=300', 's-maxage=86400', 
 // Written by the checker every run; never deployed or pruned by the site deployments.
 export const DATA_PREFIX = 'data/*';
 
-// Extensionless docs URLs → their files in the bucket.
+// /docs → its file in the bucket; the old /docs/health page is now the #health tab.
 export const ROUTES_FUNCTION_CODE = `
 function handler(event) {
   var request = event.request;
   var uri = request.uri;
+  if (uri === '/docs/health' || uri === '/docs/health/') {
+    return { statusCode: 301, statusDescription: 'Moved Permanently', headers: { location: { value: '/docs#health' } } };
+  }
   if (uri === '/docs' || uri === '/docs/') request.uri = '/docs/index.html';
-  else if (uri === '/docs/health') request.uri = '/docs/health.html';
   return request;
 }
 `;
@@ -147,7 +149,7 @@ export class StatusStack extends Stack {
     });
 
     const routes = new cloudfront.Function(this, 'Routes', {
-      comment: 'Serve /docs and /docs/health',
+      comment: 'Serve /docs; redirect /docs/health to /docs#health',
       runtime: cloudfront.FunctionRuntime.JS_2_0,
       code: cloudfront.FunctionCode.fromInline(ROUTES_FUNCTION_CODE),
     });

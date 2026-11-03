@@ -54,12 +54,12 @@ test('every log group expires after 90 days', () => {
   for (const group of groups) expect(group.Properties.RetentionInDays).toBe(90);
 });
 
-test('the docs routes map extensionless URLs to files', () => {
+test('the docs routes map /docs to its file and redirect the old testing page to its tab', () => {
   const handler = new Function(`${ROUTES_FUNCTION_CODE}; return handler;`)();
   const route = (uri: string) => handler({ request: { uri } }).uri;
   expect(route('/docs')).toBe('/docs/index.html');
   expect(route('/docs/')).toBe('/docs/index.html');
-  expect(route('/docs/health')).toBe('/docs/health.html');
+  expect(handler({ request: { uri: '/docs/health' } })).toEqual({ statusCode: 301, statusDescription: 'Moved Permanently', headers: { location: { value: '/docs#health' } } });
   expect(route('/docs/health.md')).toBe('/docs/health.md');
   expect(route('/data/status.json')).toBe('/data/status.json');
 });

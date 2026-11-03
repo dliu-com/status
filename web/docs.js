@@ -1,6 +1,6 @@
 'use strict';
 
-const TABS = ['architecture', 'checks', 'cost', 'security'];
+const TABS = ['architecture', 'checks', 'cost', 'security', 'health'];
 // Old links: /docs#how was the first tab's name.
 const ALIASES = { how: 'architecture' };
 const STATUS_LABELS = { up: 'Up', degraded: 'Degraded', down: 'Down' };
