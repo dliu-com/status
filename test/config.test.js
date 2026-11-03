@@ -30,7 +30,8 @@ test('checks are read only, stay on the site and never sign in', () => {
     const host = new URL(app.url).host;
     for (const fn of app.functions) for (const check of fn.checks) {
       expect(['GET', 'HEAD', undefined]).toContain(check.method);
-      expect(new URL(check.url).host).toBe(host);
+      // The site itself, or its own managed API on API Gateway when its testing page lists it.
+      expect(new URL(check.url).host).toMatch(new RegExp(`^(${host.replace(/\./g, '\\.')}|[a-z0-9]+\\.execute-api\\.eu-west-1\\.amazonaws\\.com)$`));
       expect(check).not.toHaveProperty('headers');
       expect(check).not.toHaveProperty('body');
     }

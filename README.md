@@ -45,9 +45,11 @@ counts as an essential "Health endpoint" function failing.
 
 ## Changing the checks
 
-1. Read the site's `https://<site>/docs/health.md`.
-2. Edit `config/apps.json`: a check is `{ "url", "method" (GET/HEAD), "expect": { "status", "type", "contains",
-   "json", "location" }, "slowMs"?, "timeoutMs"?, "name"? }`.
+1. `node scripts/import-health.js <key>` reads the site's `https://<site>/docs/health.md` and rewrites that site's
+   functions and checks in `config/apps.json`. Review the diff: rules a table can't express need editing by hand
+   (auth's `configured=true` and GUID checks use `jsonEquals` / `jsonPattern`).
+2. Or edit `config/apps.json` by hand: a check is `{ "url", "method" (GET/HEAD), "expect": { "status", "type", "contains",
+   "json", "jsonEquals", "jsonPattern", "location" }, "slowMs"?, "timeoutMs"?, "name"? }`.
 3. `make check-local` runs every check from your machine and writes nothing.
 4. `make deploy`.
 
