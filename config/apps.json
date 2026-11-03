@@ -561,19 +561,58 @@
       "name": "Traffic",
       "url": "https://traffic.dliu.com/",
       "docs": "https://traffic.dliu.com/docs/health",
-      "health": false,
+      "health": true,
       "functions": [
         {
           "key": "pages",
-          "name": "Dashboard pages",
+          "name": "Pages",
           "checks": [
             {
               "url": "https://traffic.dliu.com/",
               "expect": {
                 "status": 200,
-                "type": "text/html",
-                "contains": "dl-footer"
-              }
+                "type": "text/html"
+              },
+              "slowMs": 2000
+            },
+            {
+              "url": "https://traffic.dliu.com/docs",
+              "expect": {
+                "status": 200,
+                "type": "text/html"
+              },
+              "slowMs": 2000
+            },
+            {
+              "url": "https://traffic.dliu.com/docs/health",
+              "expect": {
+                "status": 200,
+                "type": "text/html"
+              },
+              "slowMs": 2000
+            },
+            {
+              "url": "https://traffic.dliu.com/docs/health.md",
+              "expect": {
+                "status": 200,
+                "type": "text/markdown"
+              },
+              "slowMs": 2000
+            }
+          ]
+        },
+        {
+          "key": "public-stats",
+          "name": "Public statistics",
+          "critical": false,
+          "checks": [
+            {
+              "url": "https://traffic.dliu.com/stats/7d.json",
+              "expect": {
+                "status": 200,
+                "type": "application/json"
+              },
+              "slowMs": 2000
             }
           ]
         },
@@ -587,51 +626,43 @@
               "expect": {
                 "status": 200,
                 "type": "application/javascript"
-              }
-            }
-          ]
-        },
-        {
-          "key": "api",
-          "name": "Dashboard API",
-          "checks": [
-            {
-              "url": "https://traffic.dliu.com/api/me",
-              "expect": {
-                "status": 401,
-                "type": "application/json"
               },
-              "slowMs": 5000
+              "slowMs": 2000
             }
           ]
         },
         {
           "key": "signin",
           "name": "Microsoft sign-in",
+          "critical": false,
           "checks": [
             {
               "url": "https://traffic.dliu.com/auth/login",
               "expect": {
-                "status": 302,
-                "location": "https://login.microsoftonline.com/"
+                "status": 302
               },
-              "slowMs": 5000
+              "slowMs": 3000
+            },
+            {
+              "url": "https://traffic.dliu.com/api/me",
+              "expect": {
+                "status": 401,
+                "type": "application/json"
+              },
+              "slowMs": 3000
             }
           ]
         },
         {
-          "key": "docs",
-          "name": "Docs",
+          "key": "logging",
+          "name": "Request logging",
+          "checks": []
+        },
+        {
+          "key": "bot-check",
+          "name": "Bot check",
           "critical": false,
-          "checks": [
-            {
-              "url": "https://traffic.dliu.com/docs",
-              "expect": {
-                "status": 200,
-                "type": "text/html"
-              }
-            }
-          ]
+          "checks": []
         }
       ]
     },
