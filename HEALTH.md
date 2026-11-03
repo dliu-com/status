@@ -68,7 +68,7 @@ the full text with every technical detail unfolded, and is enough on its own to 
 ```
 
 `status` is `pass`, `warn` or `fail`; the top-level `status` is the worst of the functions'. The function keys match the
-ones listed on `/docs/health`.
+ones listed in the `/docs#health` tab and `/docs/health.md`.
 
 ## 3. Tests in the site's repo
 
