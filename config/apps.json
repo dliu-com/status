@@ -1075,10 +1075,9 @@
             {
               "url": "https://weiqi.dliu.com/docs/health",
               "expect": {
-                "status": 200,
-                "contains": "dl-header"
-              },
-              "slowMs": 2000
+                "status": 301,
+                "location": "/docs#health"
+              }
             },
             {
               "url": "https://weiqi.dliu.com/docs/health.md",
