@@ -15,17 +15,32 @@ function loadConfig() {
   return JSON.parse(fs.readFileSync(file, 'utf8'));
 }
 
-// Runs every app's checks in parallel; one app's failure never stops the others.
+// Sites run a few at a time and each site's checks one after another. Firing every request at once made the small
+// Lambda's TLS handshakes queue, which showed up as false "slow" results (and sites asked for sequential requests).
+const SITES_AT_ONCE = 4;
+
+async function checkApp(app, defaults, previousStreaks, options) {
+  const functionResults = {};
+  for (const fn of app.functions) {
+    functionResults[fn.key] = [];
+    for (const check of fn.checks) functionResults[fn.key].push(await runHttpCheck(check, defaults, options));
+  }
+  const health = app.health ? await runHealthCheck(new URL('/health', app.url).href, defaults, options) : null;
+  return judgeApp(app, functionResults, health, previousStreaks, defaults);
+}
+
 async function runChecks(config, previousStreaks = {}, options = {}) {
-  const defaults = config.defaults;
-  return Promise.all(config.apps.map(async (app) => {
-    const functionResults = {};
-    await Promise.all(app.functions.map(async (fn) => {
-      functionResults[fn.key] = await Promise.all(fn.checks.map((check) => runHttpCheck(check, defaults, options)));
-    }));
-    const health = app.health ? await runHealthCheck(new URL('/health', app.url).href, defaults, options) : null;
-    return judgeApp(app, functionResults, health, previousStreaks[app.key] || {}, defaults);
-  }));
+  const results = new Array(config.apps.length);
+  let next = 0;
+  const worker = async () => {
+    while (next < config.apps.length) {
+      const index = next++;
+      const app = config.apps[index];
+      results[index] = await checkApp(app, config.defaults, previousStreaks[app.key] || {}, options);
+    }
+  };
+  await Promise.all(Array.from({ length: Math.min(SITES_AT_ONCE, config.apps.length) }, worker));
+  return results;
 }
 
 async function readState(s3, GetObjectCommand, bucket) {
