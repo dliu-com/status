@@ -12,19 +12,21 @@ The same content in two forms, kept in sync:
 
 **`/docs#health`: a tab for people.** It's a tab named *Testing* (`#health`) on the site's `/docs` page, next to its
 other tabs (Technical architecture, Cost, Security…), with the shared docs look (`dl.css`, `dl-docs.css`, `dl-tabs`,
-and the `dg-*` diagram kit). The old `/docs/health` URL answers `301` with `Location: /docs#health`. Someone who isn't technical should understand it at a
-glance:
+and the `dg-*` diagram kit). The old `/docs/health` URL answers `301` with `Location: /docs#health`.
 
-- A **diagram** of how the site is tested: status.dliu.com, as a guest, → the site's pages and public URLs → (if there
-  is a backend) `/health` → each function's dependency (database, storage…) → pass / warn / fail. Use the `dg-flow`,
-  `dg-step` and `dg-arrow` classes (and `dg-good`, `dg-warn` and `dg-bad` for the results), like the architecture
-  diagrams on the other docs pages.
-- One short plain-language line per **function** (for example *Pages*, *Game API*, *Sign-in*, *Report rendering*)
-  saying what is checked and what "down" would mean for a visitor.
-- **What isn't tested**: signed-in actions such as uploads and edits, in plain words.
-- Every technical detail **folded** in `<details>` blocks, closed by default: URLs, methods, status codes, headers,
-  content types, body markers, the `/health` JSON, timeouts and caching. A link to `/docs/health.md` says
-  "Full technical version (Markdown)".
+It is for someone who isn't technical, so it shows rather than tells, and has **no technical details at all**: no
+URLs, methods, status codes, headers, content types, JSON or code, not even folded away. Use:
+
+- **Flows**: how a test run goes, step by step (status.dliu.com visits as a guest → the site's pages and functions →
+  the site checks its own storage → working / slow / not working), with the `dg-flow`, `dg-step` and `dg-arrow`
+  classes and `dg-good`, `dg-warn` and `dg-bad` for the outcomes.
+- **Numbers**: big figures with `dg-stats` / `dg-stat`, for example "6 functions tested", "14 checks", "every 15
+  minutes", "from 3 places", "0 sign-ins needed".
+- **Tables**: one row per function in plain words: what it does for a visitor, how it's tested, and what a visitor
+  would notice if it stopped working, with a working / not working mark.
+- **Charts**: for example how many checks each function has, or what is tested versus what a guest can't test.
+- A short **not tested** list in plain words (signed-in actions such as uploads and edits).
+- One link at the end: "Technical version for machines (Markdown)" → `/docs/health.md`.
 
 **`/docs/health.md`: a Markdown file for machines and AI agents.** It's served as `text/markdown; charset=utf-8`, contains
 the full text with every technical detail unfolded, and is enough on its own to implement the tests:
@@ -73,8 +75,8 @@ ones listed in the `/docs#health` tab and `/docs/health.md`.
 ## 3. Tests in the site's repo
 
 A test that fails if the `/docs#health` tab, the `/docs/health` → `/docs#health` redirect, `/docs/health.md` or `/health` disappears, if `/health` starts reading cookies or
-the `Authorization` header, if the page loses its diagram or its technical details stop being folded, or if the
-function keys in the page, the Markdown file and the endpoint drift apart.
+the `Authorization` header, if the tab loses its diagram or gains technical details (URLs, status codes, `<code>`,
+`<details>`), or if the functions in the tab, the Markdown file and the endpoint drift apart.
 
 ## How status.dliu.com uses it
 

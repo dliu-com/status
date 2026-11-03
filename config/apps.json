@@ -28,7 +28,7 @@
       "name": "dliu.com",
       "url": "https://dliu.com/",
       "docs": "https://dliu.com/docs#health",
-      "health": false,
+      "health": true,
       "functions": [
         {
           "key": "pages",
@@ -95,10 +95,10 @@
           "checks": [
             {
               "url": "https://dliu.com/docs/health",
+              "method": "HEAD",
               "expect": {
-                "status": 200,
-                "type": "text/html",
-                "contains": "id=\"functions\""
+                "status": 301,
+                "location": "/docs#health"
               },
               "slowMs": 2000
             },
@@ -475,16 +475,15 @@
               "expect": {
                 "status": 200,
                 "type": "text/html",
-                "contains": "dl-docs-main"
+                "contains": "id=\"health\""
               },
               "slowMs": 2000
             },
             {
               "url": "https://share.dliu.com/docs/health",
               "expect": {
-                "status": 200,
-                "type": "text/html",
-                "contains": "id=\"functions\""
+                "status": 301,
+                "location": "/docs#health"
               },
               "slowMs": 2000
             },
@@ -602,8 +601,7 @@
             {
               "url": "https://traffic.dliu.com/docs/health",
               "expect": {
-                "status": 200,
-                "type": "text/html"
+                "status": 301
               },
               "slowMs": 2000
             },
@@ -1311,18 +1309,16 @@
               "expect": {
                 "status": 200,
                 "type": "text/html",
-                "contains": "dl-tabs"
+                "contains": "id=\"health\""
               },
               "slowMs": 2000
             },
             {
               "url": "https://xiangqi.dliu.com/docs/health",
               "expect": {
-                "status": 200,
-                "type": "text/html",
-                "contains": "id=\"health\""
-              },
-              "slowMs": 2000
+                "status": 301,
+                "location": "/docs#health"
+              }
             },
             {
               "url": "https://xiangqi.dliu.com/docs/health.md",
