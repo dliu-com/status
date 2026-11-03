@@ -144,7 +144,8 @@
               "expect": {
                 "status": 401,
                 "type": "application/json"
-              }
+              },
+              "slowMs": 5000
             }
           ]
         },
@@ -157,7 +158,8 @@
               "expect": {
                 "status": 302,
                 "location": "https://login.microsoftonline.com/"
-              }
+              },
+              "slowMs": 5000
             }
           ]
         },
@@ -208,7 +210,8 @@
                 "status": 200,
                 "type": "application/json",
                 "json": "signedIn"
-              }
+              },
+              "slowMs": 5000
             }
           ]
         },
@@ -221,7 +224,8 @@
               "expect": {
                 "status": 302,
                 "location": "https://login.microsoftonline.com/"
-              }
+              },
+              "slowMs": 5000
             }
           ]
         },
@@ -293,7 +297,8 @@
               "expect": {
                 "status": 401,
                 "type": "application/json"
-              }
+              },
+              "slowMs": 5000
             }
           ]
         },
@@ -306,7 +311,8 @@
               "expect": {
                 "status": 302,
                 "location": "https://login.microsoftonline.com/"
-              }
+              },
+              "slowMs": 5000
             }
           ]
         },
@@ -356,7 +362,8 @@
               "expect": {
                 "status": 401,
                 "type": "application/json"
-              }
+              },
+              "slowMs": 5000
             }
           ]
         },
@@ -369,7 +376,8 @@
               "expect": {
                 "status": 302,
                 "location": "https://login.microsoftonline.com/"
-              }
+              },
+              "slowMs": 5000
             }
           ]
         },
@@ -433,7 +441,8 @@
               "expect": {
                 "status": 401,
                 "type": "application/json"
-              }
+              },
+              "slowMs": 5000
             }
           ]
         },
@@ -446,7 +455,8 @@
               "expect": {
                 "status": 302,
                 "location": "https://login.microsoftonline.com/"
-              }
+              },
+              "slowMs": 5000
             }
           ]
         },
@@ -497,7 +507,8 @@
                 "status": 200,
                 "type": "application/json",
                 "json": "signedIn"
-              }
+              },
+              "slowMs": 5000
             }
           ]
         },
@@ -510,7 +521,8 @@
               "expect": {
                 "status": 302,
                 "location": "https://login.microsoftonline.com/"
-              }
+              },
+              "slowMs": 5000
             }
           ]
         },
@@ -539,37 +551,93 @@
       "functions": [
         {
           "key": "pages",
-          "name": "Pages",
+          "name": "Token page",
           "checks": [
             {
               "url": "https://auth.dliu.com/",
               "expect": {
                 "status": 200,
                 "type": "text/html",
-                "contains": "dl-footer"
-              }
-            },
+                "contains": "Sign in. Get your token."
+              },
+              "slowMs": 2000
+            }
+          ]
+        },
+        {
+          "key": "runtime",
+          "name": "Page controls",
+          "checks": [
+            {
+              "url": "https://auth.dliu.com/app.js",
+              "method": "HEAD",
+              "expect": {
+                "status": 200,
+                "type": "text/javascript"
+              },
+              "slowMs": 2000
+            }
+          ]
+        },
+        {
+          "key": "configuration",
+          "name": "Sign-in setup",
+          "checks": [
+            {
+              "url": "https://auth.dliu.com/config.json",
+              "expect": {
+                "status": 200,
+                "type": "application/json",
+                "jsonEquals": {
+                  "configured": true
+                },
+                "jsonPattern": {
+                  "tenantId": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+                  "clientId": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+                  "audience": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+                }
+              },
+              "slowMs": 2000
+            }
+          ]
+        },
+        {
+          "key": "signin",
+          "name": "Sign-in return page",
+          "checks": [
             {
               "url": "https://auth.dliu.com/redirect.html",
               "expect": {
                 "status": 200,
                 "type": "text/html",
-                "contains": "</html>"
-              }
+                "contains": "src=\"/redirect.js\""
+              },
+              "slowMs": 2000
+            },
+            {
+              "url": "https://auth.dliu.com/redirect.js",
+              "method": "HEAD",
+              "expect": {
+                "status": 200,
+                "type": "text/javascript"
+              },
+              "slowMs": 2000
             }
           ]
         },
         {
-          "key": "docs",
-          "name": "Docs",
+          "key": "documentation",
+          "name": "Help pages",
           "critical": false,
           "checks": [
             {
               "url": "https://auth.dliu.com/docs",
+              "method": "HEAD",
               "expect": {
                 "status": 200,
                 "type": "text/html"
-              }
+              },
+              "slowMs": 2000
             }
           ]
         }
@@ -581,7 +649,7 @@
       "url": "https://jh.dliu.com/",
       "docs": "https://jh.dliu.com/docs/health",
       "private": true,
-      "health": false,
+      "health": true,
       "functions": [
         {
           "key": "pages",
@@ -592,14 +660,25 @@
               "expect": {
                 "status": 200,
                 "type": "text/html",
-                "contains": "dl-footer"
-              }
+                "contains": "class=\"dl-header\""
+              },
+              "slowMs": 2000
+            },
+            {
+              "url": "https://jh.dliu.com/docs",
+              "expect": {
+                "status": 200,
+                "type": "text/html",
+                "contains": "class=\"dl-tabs\""
+              },
+              "slowMs": 2000
             }
           ]
         },
         {
-          "key": "public",
-          "name": "Guest photos",
+          "key": "scenery",
+          "name": "Public scenery photos",
+          "critical": false,
           "checks": [
             {
               "url": "https://jh.dliu.com/api/public",
@@ -607,20 +686,26 @@
                 "status": 200,
                 "type": "application/json",
                 "json": "photos"
-              }
-            }
-          ]
-        },
-        {
-          "key": "api",
-          "name": "API",
-          "checks": [
+              },
+              "slowMs": 2000
+            },
             {
-              "url": "https://jh.dliu.com/api/me",
+              "url": "https://jh.dliu.com/api/guest/guestSea",
+              "method": "HEAD",
               "expect": {
                 "status": 200,
-                "type": "application/json"
-              }
+                "type": "image/jpeg"
+              },
+              "slowMs": 2000
+            },
+            {
+              "url": "https://jh.dliu.com/api/guest/guestHarbour",
+              "method": "HEAD",
+              "expect": {
+                "status": 200,
+                "type": "image/jpeg"
+              },
+              "slowMs": 2000
             }
           ]
         },
@@ -633,23 +718,45 @@
               "expect": {
                 "status": 302,
                 "location": "https://login.microsoftonline.com/"
-              }
+              },
+              "slowMs": 3000
+            },
+            {
+              "url": "https://jh.dliu.com/api/me",
+              "expect": {
+                "status": 200,
+                "type": "application/json",
+                "contains": "\"signedIn\":false"
+              },
+              "slowMs": 3000
             }
           ]
         },
         {
-          "key": "docs",
-          "name": "Docs",
-          "critical": false,
+          "key": "private",
+          "name": "Privacy gate",
           "checks": [
             {
-              "url": "https://jh.dliu.com/docs",
+              "url": "https://jh.dliu.com/api/story",
               "expect": {
-                "status": 200,
-                "type": "text/html"
-              }
+                "status": 401,
+                "type": "application/json",
+                "json": "error"
+              },
+              "slowMs": 3000
             }
           ]
+        },
+        {
+          "key": "memories",
+          "name": "Memory storage",
+          "checks": []
+        },
+        {
+          "key": "media",
+          "name": "Private media storage",
+          "critical": false,
+          "checks": []
         }
       ]
     },
@@ -684,7 +791,8 @@
                 "status": 200,
                 "type": "application/json",
                 "json": "games"
-              }
+              },
+              "slowMs": 5000
             }
           ]
         },
@@ -709,7 +817,7 @@
       "name": "DL Xiangqi",
       "url": "https://xiangqi.dliu.com/",
       "docs": "https://xiangqi.dliu.com/docs/health",
-      "health": false,
+      "health": true,
       "functions": [
         {
           "key": "pages",
@@ -720,21 +828,50 @@
               "expect": {
                 "status": 200,
                 "type": "text/html",
-                "contains": "dl-footer"
-              }
-            }
-          ]
-        },
-        {
-          "key": "game",
-          "name": "Game API",
-          "checks": [
+                "contains": "id=\"board\""
+              },
+              "slowMs": 2000
+            },
             {
-              "url": "https://xiangqi.dliu.com/api/game",
+              "url": "https://xiangqi.dliu.com/",
+              "method": "HEAD",
               "expect": {
                 "status": 200,
-                "type": "application/json",
-                "json": "state"
+                "type": "text/html"
+              },
+              "slowMs": 2000
+            },
+            {
+              "url": "http://xiangqi.dliu.com/",
+              "expect": {
+                "status": 301,
+                "location": "https://xiangqi.dliu.com/"
+              }
+            },
+            {
+              "url": "https://xiangqi.dliu.com/app.js",
+              "expect": {
+                "status": 200,
+                "type": "text/javascript",
+                "contains": "registerGameTools"
+              },
+              "slowMs": 2000
+            },
+            {
+              "url": "https://xiangqi.dliu.com/styles.css",
+              "expect": {
+                "status": 200,
+                "type": "text/css",
+                "contains": ".board"
+              },
+              "slowMs": 2000
+            },
+            {
+              "url": "https://xiangqi.dliu.com/no-such-page",
+              "expect": {
+                "status": 404,
+                "type": "text/html",
+                "contains": "dl-header"
               }
             }
           ]
@@ -748,8 +885,58 @@
               "url": "https://xiangqi.dliu.com/docs",
               "expect": {
                 "status": 200,
-                "type": "text/html"
-              }
+                "type": "text/html",
+                "contains": "dl-tabs"
+              },
+              "slowMs": 2000
+            },
+            {
+              "url": "https://xiangqi.dliu.com/docs/health",
+              "expect": {
+                "status": 200,
+                "type": "text/html",
+                "contains": "id=\"health\""
+              },
+              "slowMs": 2000
+            },
+            {
+              "url": "https://xiangqi.dliu.com/docs/health.md",
+              "expect": {
+                "status": 200,
+                "type": "text/markdown",
+                "contains": "# DL 中国象棋 (xiangqi.dliu.com): guest testing"
+              },
+              "slowMs": 2000
+            }
+          ]
+        },
+        {
+          "key": "game",
+          "name": "Shared game",
+          "checks": [
+            {
+              "url": "https://xiangqi.dliu.com/api/game",
+              "expect": {
+                "status": 200,
+                "type": "application/json",
+                "json": "state"
+              },
+              "slowMs": 3000
+            }
+          ]
+        },
+        {
+          "key": "rules",
+          "name": "Move rules",
+          "checks": [
+            {
+              "url": "https://xiangqi.dliu.com/engine.js",
+              "expect": {
+                "status": 200,
+                "type": "text/javascript",
+                "contains": "allLegalMoves"
+              },
+              "slowMs": 2000
             }
           ]
         }

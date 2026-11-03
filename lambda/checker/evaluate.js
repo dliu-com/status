@@ -34,7 +34,10 @@ function judgeFunction(fn, checks, previousStreak, failuresBeforeDown) {
 // Merges the site's /health answer into its functions: same key → extra check, new key → new function.
 function withHealth(app, functionResults, health) {
   const functions = app.functions.map((fn) => ({ fn, checks: [...(functionResults[fn.key] || [])] }));
-  if (!health) return functions;
+  if (!health) {
+    for (const f of functions) if (!f.checks.length) f.checks.push({ name: `Health: ${f.fn.name}`, status: 'fail', detail: '/health was not read' });
+    return functions;
+  }
   functions.push({
     fn: { key: 'health', name: 'Health endpoint', critical: true },
     checks: [{ name: 'GET /health', status: health.status, detail: health.detail, ms: health.ms }],
@@ -48,6 +51,10 @@ function withHealth(app, functionResults, health) {
     const existing = functions.find((f) => f.fn.key === reported.key);
     if (existing) existing.checks.push(check);
     else functions.push({ fn: { key: reported.key, name: reported.name, critical: true }, checks: [check] });
+  }
+  // A function configured to come only from /health must not pass silently when /health stops reporting it.
+  for (const f of functions) {
+    if (!f.checks.length) f.checks.push({ name: `Health: ${f.fn.name}`, status: 'fail', detail: 'Not reported by /health' });
   }
   return functions;
 }

@@ -30,6 +30,8 @@ test('fails on a wrong status, type, marker, JSON key or redirect target', async
     [{ status: 200, contains: 'dl-footer' }, reply(200, { body: '<html>' })],
     [{ status: 200, json: 'records' }, reply(200, { type: 'application/json', body: '{"x":1}' })],
     [{ status: 200, json: 'records' }, reply(200, { type: 'application/json', body: 'not json' })],
+    [{ status: 200, jsonEquals: { configured: true } }, reply(200, { type: 'application/json', body: '{"configured":"true"}' })],
+    [{ status: 200, jsonPattern: { id: '^[0-9a-f-]{36}$' } }, reply(200, { type: 'application/json', body: '{"id":"nope"}' })],
     [{ status: 302, location: 'https://login.microsoftonline.com/' }, reply(302, { location: 'https://evil.example/' })],
   ];
   for (const [expectation, response] of cases) {
@@ -45,6 +47,16 @@ test('accepts the expected redirect and the expected 401', async () => {
   const api = await runHttpCheck({ url: 'https://a.dliu.com/api/me', expect: { status: 401, type: 'application/json' } }, defaults,
     opts(async () => reply(401, { type: 'application/json; charset=utf-8', body: '{}' })));
   expect(api.status).toBe('pass');
+});
+
+test('checks exact JSON values and patterns without echoing them', async () => {
+  const body = '{"configured":true,"tenantId":"d6229c1d-85e4-4a28-bd67-6c14b995fcae"}';
+  const result = await runHttpCheck({ url: 'https://a.dliu.com/config.json', expect: { status: 200, jsonEquals: { configured: true }, jsonPattern: { tenantId: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$' } } },
+    defaults, opts(async () => reply(200, { type: 'application/json', body })));
+  expect(result.status).toBe('pass');
+  const bad = await runHttpCheck({ url: 'https://a.dliu.com/config.json', expect: { status: 200, jsonPattern: { tenantId: '^x$' } } },
+    defaults, opts(async () => reply(200, { type: 'application/json', body })));
+  expect(bad.detail).not.toContain('d6229c1d');
 });
 
 test('retries a failure once in the same run', async () => {

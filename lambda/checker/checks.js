@@ -54,7 +54,7 @@ async function requestOnce(check, defaults, fetchImpl) {
     const location = response.headers.get('location') || '';
     if (!location.startsWith(expect.location)) return fail(`Redirects to ${location ? new URL(location, check.url).origin : 'nowhere'}, expected ${new URL(expect.location).origin}`);
   }
-  if (expect.contains || expect.json) {
+  if (expect.contains || expect.json || expect.jsonEquals || expect.jsonPattern) {
     let body;
     try {
       body = await readBody(response);
@@ -62,14 +62,22 @@ async function requestOnce(check, defaults, fetchImpl) {
       return fail('Body could not be read');
     }
     if (expect.contains && !body.includes(expect.contains)) return fail('Page content is missing its marker');
-    if (expect.json) {
+    if (expect.json || expect.jsonEquals || expect.jsonPattern) {
       let parsed;
       try {
         parsed = JSON.parse(body);
       } catch {
         return fail('Answer is not JSON');
       }
-      if (!parsed || typeof parsed !== 'object' || !(expect.json in parsed)) return fail(`JSON has no "${expect.json}"`);
+      if (!parsed || typeof parsed !== 'object') return fail('Answer is not a JSON object');
+      if (expect.json && !(expect.json in parsed)) return fail(`JSON has no "${expect.json}"`);
+      for (const [key, value] of Object.entries(expect.jsonEquals || {})) {
+        if (parsed[key] !== value) return fail(`JSON "${key}" is not ${JSON.stringify(value)}`);
+      }
+      // Values are never echoed: some are identifiers the site asks not to log.
+      for (const [key, pattern] of Object.entries(expect.jsonPattern || {})) {
+        if (typeof parsed[key] !== 'string' || !new RegExp(pattern).test(parsed[key])) return fail(`JSON "${key}" is missing or malformed`);
+      }
     }
   } else if (response.body) {
     await response.body.cancel().catch(() => {});

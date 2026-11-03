@@ -19,7 +19,8 @@ test('every site has a key, name, https URL, testing page and functions with che
     for (const fn of app.functions) {
       expect(fn.key).toMatch(/^[a-z0-9-]+$/);
       expect(fn.key).not.toBe('health');
-      expect(fn.checks.length).toBeGreaterThan(0);
+      // Functions with no guest checks are filled in by the site's /health.
+      if (!app.health) expect(fn.checks.length).toBeGreaterThan(0);
     }
   }
 });

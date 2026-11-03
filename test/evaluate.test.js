@@ -73,3 +73,13 @@ test('the public file leaves private sites out entirely', () => {
   expect(view.status).toBe('up');
   expect(view.apps[0].days).toHaveLength(90);
 });
+
+test('a function configured to come from /health fails when /health stops reporting it', () => {
+  const withHealthOnly = { ...app, functions: [...app.functions, { key: 'media', name: 'Media', critical: false, checks: [] }] };
+  const health = { status: 'pass', detail: 'Answered', ms: 50, functions: [] };
+  const result = judgeApp(withHealthOnly, { pages: [pass], docs: [pass] }, health, {}, defaults);
+  const media = result.functions.find((f) => f.key === 'media');
+  expect(media.checks[0].detail).toBe('Not reported by /health');
+  expect(media.status).toBe('degraded');
+  expect(media.critical).toBe(false);
+});
