@@ -1,5 +1,22 @@
 {
   "intervalMinutes": 15,
+  "locations": [
+    {
+      "key": "ie",
+      "name": "Ireland",
+      "region": "eu-west-1"
+    },
+    {
+      "key": "us",
+      "name": "Virginia (US)",
+      "region": "us-east-1"
+    },
+    {
+      "key": "jp",
+      "name": "Tokyo",
+      "region": "ap-northeast-1"
+    }
+  ],
   "defaults": {
     "timeoutMs": 10000,
     "slowMs": 3000,
@@ -352,7 +369,7 @@
       "name": "Files",
       "url": "https://files.dliu.com/",
       "docs": "https://files.dliu.com/docs/health",
-      "health": false,
+      "health": true,
       "functions": [
         {
           "key": "pages",
@@ -362,75 +379,74 @@
               "url": "https://files.dliu.com/",
               "expect": {
                 "status": 200,
-                "type": "text/html",
-                "contains": "dl-footer"
+                "contains": "dl-header"
               }
             }
           ]
         },
         {
           "key": "shared-ui",
-          "name": "Shared look for every site",
+          "name": "Shared UI",
           "checks": [
             {
               "url": "https://files.dliu.com/dliu.com/ui/v1/dl.css",
               "expect": {
                 "status": 200,
-                "type": "text/css",
-                "contains": "--dl-accent"
+                "contains": "--dl-"
               }
             },
             {
               "url": "https://files.dliu.com/dliu.com/favicon.png",
-              "method": "HEAD",
               "expect": {
-                "status": 200,
-                "type": "image/png"
+                "status": 200
               }
             }
           ]
         },
         {
-          "key": "api",
-          "name": "Files API",
+          "key": "listing",
+          "name": "File list",
+          "critical": false,
           "checks": [
             {
-              "url": "https://files.dliu.com/api/files",
+              "url": "https://files.dliu.com/_data/files.json",
               "expect": {
-                "status": 401,
-                "type": "application/json"
-              },
-              "slowMs": 5000
+                "status": 200,
+                "contains": "files"
+              }
             }
           ]
         },
         {
           "key": "signin",
-          "name": "Microsoft sign-in",
+          "name": "Sign-in",
           "checks": [
             {
               "url": "https://files.dliu.com/auth/login",
               "expect": {
                 "status": 302,
                 "location": "https://login.microsoftonline.com/"
-              },
-              "slowMs": 5000
+              }
             }
           ]
         },
         {
-          "key": "docs",
-          "name": "Docs",
-          "critical": false,
+          "key": "api",
+          "name": "API",
           "checks": [
             {
-              "url": "https://files.dliu.com/docs",
+              "url": "https://files.dliu.com/api/files",
               "expect": {
-                "status": 200,
-                "type": "text/html"
+                "status": 401,
+                "contains": "error"
               }
             }
           ]
+        },
+        {
+          "key": "health",
+          "name": "Health check",
+          "checks": []
         }
       ]
     },

@@ -38,10 +38,11 @@ function withHealth(app, functionResults, health) {
     for (const f of functions) if (!f.checks.length) f.checks.push({ name: `Health: ${f.fn.name}`, status: 'fail', detail: '/health was not read' });
     return functions;
   }
-  functions.push({
-    fn: { key: 'health', name: 'Health endpoint', critical: true },
-    checks: [{ name: 'GET /health', status: health.status, detail: health.detail, ms: health.ms }],
-  });
+  // The endpoint itself joins a configured "health" function (a site may list it), or becomes its own function.
+  const endpoint = { name: 'GET /health', status: health.status, detail: health.detail, ms: health.ms, ...(health.locations ? { locations: health.locations } : {}) };
+  const configured = functions.find((f) => f.fn.key === 'health');
+  if (configured) configured.checks.push(endpoint);
+  else functions.push({ fn: { key: 'health', name: 'Health endpoint', critical: true }, checks: [endpoint] });
   for (const reported of health.functions) {
     const check = {
       name: `Health: ${reported.name}`,
@@ -162,7 +163,7 @@ function buildPublic(config, state, results, now) {
         critical: f.critical,
         status: f.status,
         detail: f.detail,
-        checks: f.checks.map((c) => ({ name: c.name, status: c.status, detail: c.detail, ms: c.ms })),
+        checks: f.checks.map((c) => ({ name: c.name, status: c.status, detail: c.detail, ms: c.ms, ...(c.locations ? { locations: c.locations } : {}) })),
       })),
     };
   });

@@ -56,6 +56,9 @@
 .checks ul { list-style: none; margin: 6px 0 0; padding: 0; display: grid; gap: 6px; font-size: 0.8125rem; }
 .checks li { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
 .checks code { font-family: var(--dl-mono); }
+.locations { display: flex; flex-wrap: wrap; gap: 4px 12px; flex-basis: 100%; padding-left: 16px; color: var(--dl-muted); }
+.location { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+.dot-none { background: var(--dl-line); }
 .how-tested { display: inline-block; margin-top: 4px; font-size: 0.875rem; }
 
 .incidents { margin-top: 32px; }

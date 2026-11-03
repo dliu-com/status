@@ -38,7 +38,7 @@ function dayBar(day) {
   return bar;
 }
 
-function renderFunction(fn) {
+function renderFunction(fn, locations) {
   const item = el('li', 'fn');
   const head = el('div', 'fn-head');
   head.append(el('span', `dot dot-${fn.status}`), el('strong', null, fn.name));
@@ -52,6 +52,18 @@ function renderFunction(fn) {
     const row = el('li');
     row.append(el('span', `dot dot-${check.status === 'pass' ? 'up' : check.status === 'warn' ? 'degraded' : 'down'}`));
     row.append(el('code', null, check.name), ' ', el('span', 'dl-muted', `${CHECK_LABELS[check.status]}: ${check.detail}`));
+    if (check.locations && locations.length > 1) {
+      const where = el('span', 'locations');
+      for (const location of locations) {
+        const result = check.locations[location.key];
+        const tone = !result ? 'none' : result.status === 'pass' ? 'up' : result.status === 'warn' ? 'degraded' : 'down';
+        const item = el('span', 'location');
+        item.title = result ? `${location.name}: ${result.detail}` : `${location.name}: did not run`;
+        item.append(el('span', `dot dot-${tone}`), ` ${location.name}${result && result.status !== 'fail' ? ` ${result.ms < 1000 ? `${result.ms} ms` : `${(result.ms / 1000).toFixed(1)} s`}` : ''}`);
+        where.append(item);
+      }
+      row.append(where);
+    }
     list.append(row);
   }
   details.append(list);
@@ -59,7 +71,7 @@ function renderFunction(fn) {
   return item;
 }
 
-function renderApp(app) {
+function renderApp(app, locations) {
   const card = el('article', `dl-card app app-${app.status}`);
   const head = el('div', 'app-head');
   const title = el('h2');
@@ -85,7 +97,7 @@ function renderApp(app) {
   const working = app.functions.filter((f) => f.status === 'up').length;
   functions.append(el('summary', null, `${app.functions.length} functions · ${working} working`));
   const list = el('ul', 'fn-list');
-  for (const fn of app.functions) list.append(renderFunction(fn));
+  for (const fn of app.functions) list.append(renderFunction(fn, locations));
   functions.append(list);
   const docs = el('a', 'how-tested', 'How this site is tested');
   docs.href = app.docs;
@@ -114,6 +126,10 @@ function renderIncidents(incidents) {
   }
 }
 
+function listNames(names) {
+  return names.length < 2 ? names.join('') : `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`;
+}
+
 function renderOverall(data) {
   const text = document.getElementById('overall-text');
   const meta = document.getElementById('overall-meta');
@@ -125,7 +141,11 @@ function renderOverall(data) {
   else if (down) text.textContent = `${down} ${down === 1 ? 'site is' : 'sites are'} down${degraded ? `, ${degraded} degraded` : ''}`;
   else text.textContent = `${degraded} ${degraded === 1 ? 'site has' : 'sites have'} a problem`;
   const stale = Date.now() - Date.parse(data.generatedAt) > (data.intervalMinutes * 2 + 5) * 60000;
-  meta.textContent = `Checked every ${data.intervalMinutes} minutes as a guest · last check ${ago(data.generatedAt)}`;
+  const locations = data.locations || [];
+  const from = locations.length ? ` from ${listNames(locations.map((l) => l.name))}` : '';
+  meta.textContent = `Checked every ${data.intervalMinutes} minutes as a guest${from} · last check ${ago(data.generatedAt)}`;
+  const missing = locations.filter((l) => !l.ran);
+  if (missing.length) meta.append(el('span', null, ` · ${listNames(missing.map((l) => l.name))} couldn't check this time`));
   if (stale) meta.append(el('strong', 'dl-error', ' · the checker has stopped, so this may be out of date'));
 }
 
@@ -138,7 +158,7 @@ async function load() {
     const apps = document.getElementById('apps');
     const open = new Set([...apps.querySelectorAll('details[open]')].map((d) => d.closest('[data-key]')?.dataset.key));
     apps.replaceChildren(...data.apps.map((app) => {
-      const card = renderApp(app);
+      const card = renderApp(app, data.locations || []);
       card.dataset.key = app.key;
       if (open.has(app.key)) card.querySelector('details.functions').open = true;
       return card;

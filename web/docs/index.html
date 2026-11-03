@@ -18,36 +18,46 @@
   </header>
   <main class="dl-main dl-docs-main">
     <nav class="dl-tabs" aria-label="Docs sections">
-      <a href="/docs#how" data-tab="how" aria-current="page">How it works</a>
+      <a href="/docs#architecture" data-tab="architecture" aria-current="page">Technical architecture</a>
       <a href="/docs#checks" data-tab="checks">Every check</a>
       <a href="/docs#cost" data-tab="cost">Cost</a>
+      <a href="/docs#security" data-tab="security">Security</a>
       <a href="/docs/health">Testing this site</a>
     </nav>
 
-    <article class="dl-docs" id="how" data-section>
-      <h2>How it works</h2>
-      <p class="lead">Every 15 minutes, status.dliu.com visits each dliu.com site the way a guest would (no sign-in, no cookies) and
-        decides whether each of its functions is up, degraded or down.</p>
+    <article class="dl-docs" id="architecture" data-section>
+      <h2>Technical architecture</h2>
+      <p class="lead">Every 15 minutes, status.dliu.com visits each dliu.com site the way a guest would (no sign-in, no cookies)
+        from Ireland, Virginia (US) and Tokyo, and decides whether each of its functions is up, degraded or down.</p>
       <figure class="dg">
         <figcaption>One check run</figcaption>
         <div class="dg-flow">
-          <div class="dg-step"><span class="dg-num">1</span><span class="dg-icon icon-status"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 7v5l3 2"/></svg></span><span class="dg-text"><strong>Every 15 minutes</strong><small>a scheduled Lambda starts</small></span></div>
+          <div class="dg-step"><span class="dg-num">1</span><span class="dg-icon icon-status"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 7v5l3 2"/></svg></span><span class="dg-text"><strong>Every 15 minutes</strong><small>the checker in Ireland starts</small></span></div>
           <span class="dg-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
-          <div class="dg-step"><span class="dg-num">2</span><span class="dg-icon icon-site"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/></svg></span><span class="dg-text"><strong>Visit as a guest</strong><small>pages and public URLs listed in each site's testing page</small></span></div>
+          <div class="dg-step"><span class="dg-num">2</span><span class="dg-icon icon-site"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg></span><span class="dg-text"><strong>Visit from 3 places</strong><small>Ireland, Virginia and Tokyo run the same checks at once</small></span></div>
           <span class="dg-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
-          <div class="dg-step"><span class="dg-num">3</span><span class="dg-icon icon-health"><svg viewBox="0 0 24 24"><path d="M3 12h4l2-5 4 10 2-5h6"/></svg></span><span class="dg-text"><strong>Ask /health</strong><small>the site checks its own database and storage</small></span></div>
+          <div class="dg-step"><span class="dg-num">3</span><span class="dg-icon icon-health"><svg viewBox="0 0 24 24"><path d="M3 12h4l2-5 4 10 2-5h6"/></svg></span><span class="dg-text"><strong>Pages, APIs, /health</strong><small>what each site's testing page lists</small></span></div>
           <span class="dg-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
-          <div class="dg-step"><span class="dg-num">4</span><span class="dg-icon icon-result"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span><span class="dg-text"><strong>Judge</strong><small>up, degraded or down for each function</small></span></div>
+          <div class="dg-step"><span class="dg-num">4</span><span class="dg-icon icon-result"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span><span class="dg-text"><strong>Combine and judge</strong><small>up, degraded or down for each function</small></span></div>
           <span class="dg-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
-          <div class="dg-step"><span class="dg-num">5</span><span class="dg-icon icon-data"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg></span><span class="dg-text"><strong>Publish</strong><small>this page shows the result</small></span></div>
+          <div class="dg-step"><span class="dg-num">5</span><span class="dg-icon icon-data"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg></span><span class="dg-text"><strong>Publish</strong><small>the status page shows the result</small></span></div>
         </div>
         <p class="dg-note">The checker has no sign-in and no access to the sites' data. It sees only what any visitor sees.</p>
       </figure>
 
+      <h3>Three locations</h3>
+      <p>Each check runs from Ireland, Virginia (US) and Tokyo, so a problem near one place doesn't look like an outage, and a
+        problem only one place sees still shows up.</p>
+      <div class="dg-flow">
+        <div class="dg-step dg-good"><span class="dg-text"><strong>Passes everywhere</strong><small>pass</small></span></div>
+        <div class="dg-step dg-warn"><span class="dg-text"><strong>Fails from one place</strong><small>degraded, e.g. "fails from Tokyo only"</small></span></div>
+        <div class="dg-step dg-bad"><span class="dg-text"><strong>Fails from most places</strong><small>fail</small></span></div>
+      </div>
+
       <h3>Up, degraded or down</h3>
       <div class="dg-flow">
         <div class="dg-step dg-good"><span class="dg-text"><strong>Up</strong><small>every check passed</small></span></div>
-        <div class="dg-step dg-warn"><span class="dg-text"><strong>Degraded</strong><small>slow (over 3 s), reported "warn", or failed once</small></span></div>
+        <div class="dg-step dg-warn"><span class="dg-text"><strong>Degraded</strong><small>slow, failing from one place, reported "warn", or failed once</small></span></div>
         <div class="dg-step dg-bad"><span class="dg-text"><strong>Down</strong><small>failed two runs in a row</small></span></div>
       </div>
       <ul>
@@ -55,15 +65,25 @@
         <li>A failed check is tried again 2 seconds later in the same run, so one lost request doesn't count.</li>
         <li>Availability counts degraded as available; only down time lowers it.</li>
         <li>Private sites are checked too but not shown here.</li>
+        <li>The checks never count as visits on traffic.dliu.com.</li>
       </ul>
       <details>
         <summary>Technical details</summary>
-        <ul>
-          <li>Checker: Lambda <code>Checker</code> (Node.js 22, arm64), EventBridge <code>rate(15 minutes)</code>, 90 s timeout. Each request: 10 s timeout, <code>redirect: manual</code>, no cookies, user agent <code>dliu-status-bot/1.0 (+https://status.dliu.com/docs)</code>.</li>
-          <li>Definition: <code>config/apps.json</code> in <a href="https://github.com/dliu-com/status">dliu-com/status</a>. Each site has functions, and each function has checks (URL, method, expected status, content type, body marker, JSON key or redirect target). Sites with a backend also answer <code>GET /health</code> in <code>application/health+json</code>; the contract is <code>HEALTH.md</code>.</li>
-          <li>State (failure streaks, 90 days of daily counts, the last 24 h, incidents) is kept in a private S3 bucket; the public summary is <code>/data/status.json</code>, cached for 60 s.</li>
-          <li>traffic.dliu.com drops requests with this user agent, so checks never count as visits.</li>
-        </ul>
+        <div class="dl-table-wrap">
+          <table class="dl-table">
+            <thead><tr><th>Part</th><th>What it is</th></tr></thead>
+            <tbody>
+              <tr><td>Schedule</td><td>EventBridge rule <code>rate(15 minutes)</code> in eu-west-1, no retries.</td></tr>
+              <tr><td>Checker</td><td>Lambda (Node.js 22, arm64, 256 MB, 120 s) in eu-west-1. Runs the checks itself (Ireland), calls the probes, merges, judges, and writes the state and <code>/data/status.json</code>.</td></tr>
+              <tr><td>Probes</td><td>Lambda <code>dliu-status-probe</code> in us-east-1 and ap-northeast-1 (stacks <code>StatusProbe-us</code>, <code>StatusProbe-jp</code>): same code and checks, invoked synchronously, returns raw results. No permissions beyond its logs.</td></tr>
+              <tr><td>Requests</td><td>GET or HEAD, 10 s timeout, <code>redirect: manual</code>, no cookies or <code>Authorization</code>, user agent <code>dliu-status-bot/1.0 (+https://status.dliu.com/docs)</code>. Four sites at a time, each site's checks in order.</td></tr>
+              <tr><td>Combining</td><td>Per check: fail when more than half the locations that answered failed; warn when some failed, or more than half were slow; otherwise pass, with the median time. <code>/health</code> functions are combined the same way. A probe that doesn't answer is left out.</td></tr>
+              <tr><td>Definition</td><td><code>config/apps.json</code> in <a href="https://github.com/dliu-com/status">dliu-com/status</a>, imported from each site's <code>/docs/health.md</code>; the contract is <code>HEALTH.md</code>.</td></tr>
+              <tr><td>State</td><td>Private S3 bucket: failure streaks, 90 days of daily counts per site, incidents, private sites included. Kept if the stack is deleted.</td></tr>
+              <tr><td>Page</td><td>Static files in a private S3 bucket behind CloudFront (origin access control), <code>/data/status.json</code> cached 60 s, pages no-cache.</td></tr>
+            </tbody>
+          </table>
+        </div>
       </details>
     </article>
 
@@ -75,15 +95,16 @@
 
     <article class="dl-docs" id="cost" data-section hidden>
       <h2>Cost</h2>
-      <p class="lead">About $0.05 a month, well under the $1 limit, because nothing runs between checks.</p>
+      <p class="lead">About $0.06 a month, well under the $1 limit, because nothing runs between checks.</p>
       <div class="dl-table-wrap">
         <table class="dl-table">
           <thead><tr><th>What</th><th>How much a month</th><th class="dl-num">Cost</th></tr></thead>
           <tbody>
-            <tr><td>Checker Lambda</td><td>2,880 runs × ~5 s × 256 MB ≈ 3,600 GB-s</td><td class="dl-num">$0 (free tier; $0.06 without)</td></tr>
+            <tr><td>Checker and probe Lambdas</td><td>2,880 runs × 3 locations × ~5 s × 256 MB ≈ 11,000 GB-s</td><td class="dl-num">$0 (free tier; ~$0.20 without)</td></tr>
             <tr><td>S3 writes and reads</td><td>~8,600 PUTs, ~2,900 GETs</td><td class="dl-num">~$0.05</td></tr>
+            <tr><td>Results between regions</td><td>~0.3 GB from Virginia and Tokyo to Ireland</td><td class="dl-num">~$0.01</td></tr>
             <tr><td>CloudFront</td><td>the probes and this page, well inside the free 10 M requests</td><td class="dl-num">$0</td></tr>
-            <tr><td>Each site's /health</td><td>at most one backend run a minute (60 s cache), ~35,000 in total</td><td class="dl-num">&lt; $0.02</td></tr>
+            <tr><td>Each site's /health</td><td>at most one backend run a minute per edge (60 s cache)</td><td class="dl-num">&lt; $0.02</td></tr>
             <tr><td>Logs, schedule, DNS record, certificate</td><td>small</td><td class="dl-num">~$0</td></tr>
           </tbody>
         </table>
@@ -92,6 +113,41 @@
         <summary>Why no CloudWatch metrics</summary>
         <p>Reading Lambda and CloudFront metrics for every site every 15 minutes would cost about $2 a month with
           GetMetricData, over the limit. The checks are instead purely what a guest sees, plus each site's own <code>/health</code>.</p>
+      </details>
+    </article>
+
+    <article class="dl-docs" id="security" data-section hidden>
+      <h2>Security</h2>
+      <p class="lead">status.dliu.com is a guest: it can't sign in to, change or read the private data of any site, and its
+        page shows only whether things work.</p>
+      <div class="dg-flow">
+        <div class="dg-step dg-good"><span class="dg-text"><strong>No sign-in</strong><small>no cookies, tokens or passwords anywhere</small></span></div>
+        <div class="dg-step dg-good"><span class="dg-text"><strong>Read only</strong><small>GET and HEAD; never changes anything</small></span></div>
+        <div class="dg-step dg-good"><span class="dg-text"><strong>Least access</strong><small>no AWS access to the other sites</small></span></div>
+        <div class="dg-step dg-good"><span class="dg-text"><strong>Nothing private shown</strong><small>status only; private sites left out</small></span></div>
+      </div>
+      <h3>What could go wrong, and what stops it</h3>
+      <div class="dl-table-wrap">
+        <table class="dl-table">
+          <thead><tr><th>Risk</th><th>Protection</th></tr></thead>
+          <tbody>
+            <tr><td>The checker is misused to change a site</td><td>It only sends GET and HEAD, without cookies or credentials, and doesn't follow redirects. A test fails the build if a check uses another method, adds headers or a body, or points at another host.</td></tr>
+            <tr><td>Its AWS role is misused</td><td>The checker may only read and write its own state file, write <code>data/*</code> on its page, and call the two probes. The probes have no permissions. Nothing can read the other sites' databases or storage.</td></tr>
+            <tr><td>The page leaks private details</td><td>It publishes statuses and short generic reasons only: no response bodies, no identifiers (JSON values checked by pattern are never echoed), and private sites (jh.dliu.com) are left out of the public file entirely.</td></tr>
+            <tr><td>Script injection on the status page</td><td>Strict Content Security Policy (scripts from this site only, no inline), every value written with <code>textContent</code> (a test forbids <code>innerHTML</code>), framing denied, HSTS.</td></tr>
+            <tr><td>Using status.dliu.com to flood a site</td><td>There is no way to start a check from outside: only the schedule runs them. Each site's <code>/health</code> is cached 60 s at CloudFront.</td></tr>
+            <tr><td>Someone hides from traffic.dliu.com by faking the checker's user agent</td><td>Accepted: they only hide their own visits, and such traffic already counts as a bot.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <details>
+        <summary>Technical details</summary>
+        <ul>
+          <li>Both buckets block all public access, use SSE-S3 and refuse non-TLS requests. CloudFront reads the page bucket with origin access control.</li>
+          <li>IAM: <code>s3:GetObject</code>/<code>PutObject</code> on <code>state.json</code>, <code>s3:PutObject</code> on <code>data/*</code>, <code>lambda:InvokeFunction</code> on <code>dliu-status-probe</code> in us-east-1 and ap-northeast-1. The stack test fails if CloudWatch, DynamoDB, CloudFormation or wildcard S3/Lambda permissions appear.</li>
+          <li>Headers: <code>Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' https://files.dliu.com/dliu.com/ui/; img-src 'self' https://files.dliu.com/dliu.com/; connect-src 'self'; frame-ancestors 'none'</code>, <code>X-Frame-Options: DENY</code>, <code>Referrer-Policy: no-referrer</code>, HSTS one year.</li>
+          <li>Logs are kept 90 days and contain the one-line summary per run, not response bodies.</li>
+        </ul>
       </details>
     </article>
   </main>

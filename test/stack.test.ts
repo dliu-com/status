@@ -1,14 +1,29 @@
 import { App } from 'aws-cdk-lib';
 import { Match, Template } from 'aws-cdk-lib/assertions';
 import { ROUTES_FUNCTION_CODE, StatusStack } from '../lib/status-stack';
+import { ProbeStack } from '../lib/probe-stack';
+import { LOCATIONS } from '../lib/checker-code';
 
 const template = Template.fromStack(new StatusStack(new App(), 'Test', { env: { account: '123456789012', region: 'eu-west-1' } }));
 
-test('the checker runs every 15 minutes on Node.js 22 with no AWS access beyond its two buckets', () => {
+test('the checker runs every 15 minutes on Node.js 22 with no AWS access beyond its buckets and the probes', () => {
   template.hasResourceProperties('AWS::Events::Rule', { ScheduleExpression: 'rate(15 minutes)' });
-  template.hasResourceProperties('AWS::Lambda::Function', { Handler: 'index.handler', Runtime: 'nodejs22.x', Timeout: 90 });
+  template.hasResourceProperties('AWS::Lambda::Function', { Handler: 'index.handler', Runtime: 'nodejs22.x', Timeout: 120 });
   const policies = JSON.stringify(template.findResources('AWS::IAM::Policy'));
-  expect(policies).not.toMatch(/cloudwatch:|dynamodb:|cloudformation:|"s3:\*"|lambda:Invoke/);
+  expect(policies).not.toMatch(/cloudwatch:|dynamodb:|cloudformation:|"s3:\*"|"lambda:\*"/);
+  expect(policies).toContain('arn:aws:lambda:us-east-1:123456789012:function:dliu-status-probe');
+  expect(policies).toContain('arn:aws:lambda:ap-northeast-1:123456789012:function:dliu-status-probe');
+  expect(policies).not.toContain('arn:aws:lambda:eu-west-1:123456789012:function:dliu-status-probe');
+});
+
+test('checks run from Ireland, Virginia and Tokyo; each probe is a bare Lambda with no permissions', () => {
+  expect(LOCATIONS.map((l) => l.region)).toEqual(['eu-west-1', 'us-east-1', 'ap-northeast-1']);
+  const probe = Template.fromStack(new ProbeStack(new App(), 'Probe', { env: { account: '123456789012', region: 'ap-northeast-1' } }));
+  probe.hasResourceProperties('AWS::Lambda::Function', { FunctionName: 'dliu-status-probe', Handler: 'index.probe', Runtime: 'nodejs22.x' });
+  probe.resourceCountIs('AWS::Events::Rule', 0);
+  probe.resourceCountIs('AWS::S3::Bucket', 0);
+  expect(JSON.stringify(probe.findResources('AWS::IAM::Policy'))).toBe('{}');
+  for (const group of Object.values(probe.findResources('AWS::Logs::LogGroup')) as any[]) expect(group.Properties.RetentionInDays).toBe(90);
 });
 
 test('both buckets are private and the state bucket is kept', () => {

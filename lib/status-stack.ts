@@ -1,11 +1,8 @@
-import * as fs from 'fs';
 import * as path from 'path';
 import { Construct } from 'constructs';
 import {
-  AssetHashType,
   CfnOutput,
   CfnResource,
-  DockerImage,
   Duration,
   Fn,
   RemovalPolicy,
@@ -17,12 +14,14 @@ import {
   aws_events as events,
   aws_events_targets as eventsTargets,
   aws_lambda as lambda,
+  aws_iam as iam,
   aws_logs as logs,
   aws_route53 as route53,
   aws_route53_targets as targets,
   aws_s3 as s3,
   aws_s3_deployment as s3deploy,
 } from 'aws-cdk-lib';
+import { LOCATIONS, Location, PROBE_FUNCTION_NAME, checkerCode } from './checker-code';
 
 const ROOT = path.join(__dirname, '..');
 const LOG_RETENTION = logs.RetentionDays.THREE_MONTHS;
@@ -45,6 +44,8 @@ function handler(event) {
 
 export interface StatusStackProps extends StackProps {
   subdomain?: string;
+  /** Where the checks run from (config/apps.json "locations"); the first is this stack's region. */
+  locations?: Location[];
   /** Attach traffic.dliu.com's visitor function and cookie logging, like the other sites (default true). */
   trafficLogging?: boolean;
 }
@@ -80,33 +81,15 @@ export class StatusStack extends Stack {
       removalPolicy: RemovalPolicy.RETAIN,
     });
 
-    // The checker's code plus config/apps.json, copied next to it (no Docker needed).
-    const checkerCode = lambda.Code.fromAsset(path.join(ROOT, 'lambda', 'checker'), {
-      bundling: {
-        image: DockerImage.fromRegistry('public.ecr.aws/docker/library/node:22-alpine'),
-        local: {
-          tryBundle(outputDir: string) {
-            for (const file of fs.readdirSync(path.join(ROOT, 'lambda', 'checker'))) {
-              fs.copyFileSync(path.join(ROOT, 'lambda', 'checker', file), path.join(outputDir, file));
-            }
-            fs.copyFileSync(path.join(ROOT, 'config', 'apps.json'), path.join(outputDir, 'apps.json'));
-            return true;
-          },
-        },
-        command: ['sh', '-c', 'cp -r /asset-input/* /asset-output/'],
-      },
-      // Hash the bundled output, so editing config/apps.json alone redeploys the checker.
-      assetHashType: AssetHashType.OUTPUT,
-    });
-
     const checker = new lambda.Function(this, 'Checker', {
       description: 'Tests every dliu.com site as a guest and writes data/status.json',
       runtime: lambda.Runtime.NODEJS_22_X,
       architecture: lambda.Architecture.ARM_64,
       handler: 'index.handler',
-      code: checkerCode,
+      code: checkerCode(),
       memorySize: 256,
-      timeout: Duration.seconds(90),
+      // Waits for the probes in the other regions too.
+      timeout: Duration.seconds(120),
       environment: {
         SITE_BUCKET: siteBucket.bucketName,
         STATE_BUCKET: stateBucket.bucketName,
@@ -118,6 +101,14 @@ export class StatusStack extends Stack {
       }),
     });
     stateBucket.grantReadWrite(checker, 'state.json');
+    // May call only the probes in the other locations, nothing else.
+    const remote = (props.locations ?? LOCATIONS).filter((l) => l.region !== this.region);
+    if (remote.length) {
+      checker.addToRolePolicy(new iam.PolicyStatement({
+        actions: ['lambda:InvokeFunction'],
+        resources: remote.map((l) => `arn:aws:lambda:${l.region}:${this.account}:function:${PROBE_FUNCTION_NAME}`),
+      }));
+    }
     siteBucket.grantPut(checker, DATA_PREFIX);
 
     new events.Rule(this, 'CheckSchedule', {

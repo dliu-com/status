@@ -83,3 +83,10 @@ test('a function configured to come from /health fails when /health stops report
   expect(media.status).toBe('degraded');
   expect(media.critical).toBe(false);
 });
+
+test('a configured "health" function receives the /health endpoint check', () => {
+  const listed = { ...app, functions: [...app.functions, { key: 'health', name: 'Health check', checks: [] }] };
+  const result = judgeApp(listed, { pages: [pass], docs: [pass] }, { status: 'pass', detail: 'Answered', ms: 5, functions: [] }, {}, defaults);
+  expect(result.functions.filter((f) => f.key === 'health')).toHaveLength(1);
+  expect(result.functions.find((f) => f.key === 'health').status).toBe('up');
+});

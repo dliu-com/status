@@ -5,6 +5,11 @@ test('runs every 15 minutes with sane defaults', () => {
   expect(config.defaults).toEqual({ timeoutMs: 10000, slowMs: 3000, failuresBeforeDown: 2 });
 });
 
+test('locations: Ireland first (the checker), then the probes', () => {
+  expect(config.locations.map((l) => l.key)).toEqual(['ie', 'us', 'jp']);
+  expect(config.locations[0].region).toBe('eu-west-1');
+});
+
 test('every site has a key, name, https URL, testing page and functions with checks', () => {
   const keys = new Set();
   for (const app of config.apps) {
@@ -18,7 +23,7 @@ test('every site has a key, name, https URL, testing page and functions with che
     expect(app.functions.length).toBeGreaterThan(0);
     for (const fn of app.functions) {
       expect(fn.key).toMatch(/^[a-z0-9-]+$/);
-      expect(fn.key).not.toBe('health');
+      if (fn.key === 'health') expect(app.health).toBe(true);
       // Functions with no guest checks are filled in by the site's /health.
       if (!app.health) expect(fn.checks.length).toBeGreaterThan(0);
     }

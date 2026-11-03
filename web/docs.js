@@ -1,6 +1,8 @@
 'use strict';
 
-const TABS = ['how', 'checks', 'cost'];
+const TABS = ['architecture', 'checks', 'cost', 'security'];
+// Old links: /docs#how was the first tab's name.
+const ALIASES = { how: 'architecture' };
 const STATUS_LABELS = { up: 'Up', degraded: 'Degraded', down: 'Down' };
 
 function el(tag, className, text) {
@@ -11,7 +13,8 @@ function el(tag, className, text) {
 }
 
 function showTab() {
-  const id = TABS.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'how';
+  const hash = ALIASES[location.hash.slice(1)] || location.hash.slice(1);
+  const id = TABS.includes(hash) ? hash : 'architecture';
   for (const section of document.querySelectorAll('[data-section]')) section.hidden = section.id !== id;
   for (const link of document.querySelectorAll('.dl-tabs [data-tab]')) {
     if (link.dataset.tab === id) link.setAttribute('aria-current', 'page');
