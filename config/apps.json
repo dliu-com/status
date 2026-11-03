@@ -246,7 +246,7 @@
       "name": "DL blog",
       "url": "https://blog.dliu.com/",
       "docs": "https://blog.dliu.com/docs/health",
-      "health": false,
+      "health": true,
       "functions": [
         {
           "key": "pages",
@@ -258,7 +258,44 @@
                 "status": 200,
                 "type": "text/html",
                 "contains": "dl-footer"
-              }
+              },
+              "slowMs": 2000
+            }
+          ]
+        },
+        {
+          "key": "posts",
+          "name": "Posts",
+          "checks": [
+            {
+              "url": "https://blog.dliu.com/content/index.json",
+              "expect": {
+                "status": 200,
+                "type": "application/json",
+                "json": "posts"
+              },
+              "slowMs": 2000
+            }
+          ]
+        },
+        {
+          "key": "storage",
+          "name": "Published content storage",
+          "checks": []
+        },
+        {
+          "key": "reactions",
+          "name": "Reactions",
+          "critical": false,
+          "checks": [
+            {
+              "url": "https://blog.dliu.com/api/reactions/2026103100",
+              "expect": {
+                "status": 200,
+                "type": "application/json",
+                "json": "counts"
+              },
+              "slowMs": 3000
             }
           ]
         },
@@ -273,13 +310,14 @@
                 "type": "application/json",
                 "json": "signedIn"
               },
-              "slowMs": 5000
+              "slowMs": 3000
             }
           ]
         },
         {
           "key": "signin",
           "name": "Microsoft sign-in",
+          "critical": false,
           "checks": [
             {
               "url": "https://blog.dliu.com/auth/login",
@@ -287,7 +325,7 @@
                 "status": 302,
                 "location": "https://login.microsoftonline.com/"
               },
-              "slowMs": 5000
+              "slowMs": 3000
             }
           ]
         },
@@ -300,8 +338,10 @@
               "url": "https://blog.dliu.com/docs",
               "expect": {
                 "status": 200,
-                "type": "text/html"
-              }
+                "type": "text/html",
+                "contains": "dl-tabs"
+              },
+              "slowMs": 2000
             }
           ]
         }

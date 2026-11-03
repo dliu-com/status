@@ -9,7 +9,7 @@ const CONFIG = path.join(__dirname, '..', 'config', 'apps.json');
 
 const cells = (line) => line.trim().replace(/^\||\|$/g, '').split('|').map((c) => c.trim());
 const unquote = (text) => text.replace(/^`|`$/g, '').trim();
-const empty = (text) => !text || ['—', '-', '–', 'n/a'].includes(text.trim().toLowerCase());
+const empty = (text) => !text || ['—', '-', '–', 'n/a', 'none', '(none)', 'any'].includes(unquote(text).toLowerCase());
 
 function table(markdown, heading) {
   const start = markdown.search(new RegExp(`^##\\s+${heading}`, 'mi'));
