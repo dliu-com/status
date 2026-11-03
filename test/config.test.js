@@ -1,0 +1,44 @@
+const config = require('../config/apps.json');
+
+test('runs every 15 minutes with sane defaults', () => {
+  expect(config.intervalMinutes).toBe(15);
+  expect(config.defaults).toEqual({ timeoutMs: 10000, slowMs: 3000, failuresBeforeDown: 2 });
+});
+
+test('every site has a key, name, https URL, testing page and functions with checks', () => {
+  const keys = new Set();
+  for (const app of config.apps) {
+    expect(app.key).toMatch(/^[a-z0-9-]+$/);
+    expect(keys.has(app.key)).toBe(false);
+    keys.add(app.key);
+    expect(app.name).toBeTruthy();
+    expect(app.url).toMatch(/^https:\/\/([a-z0-9-]+\.)?dliu\.com\/$/);
+    expect(app.docs).toBe(`${app.url}docs/health`);
+    expect(typeof app.health).toBe('boolean');
+    expect(app.functions.length).toBeGreaterThan(0);
+    for (const fn of app.functions) {
+      expect(fn.key).toMatch(/^[a-z0-9-]+$/);
+      expect(fn.key).not.toBe('health');
+      expect(fn.checks.length).toBeGreaterThan(0);
+    }
+  }
+});
+
+test('checks are read only, stay on the site and never sign in', () => {
+  for (const app of config.apps) {
+    const host = new URL(app.url).host;
+    for (const fn of app.functions) for (const check of fn.checks) {
+      expect(['GET', 'HEAD', undefined]).toContain(check.method);
+      expect(new URL(check.url).host).toBe(host);
+      expect(check).not.toHaveProperty('headers');
+      expect(check).not.toHaveProperty('body');
+    }
+  }
+});
+
+test('cyy.dliu.com, link.dliu.com and home.dliu.com are not checked', () => {
+  const hosts = config.apps.map((a) => new URL(a.url).host);
+  expect(hosts).not.toContain('cyy.dliu.com');
+  expect(hosts).not.toContain('link.dliu.com');
+  expect(hosts).not.toContain('home.dliu.com');
+});

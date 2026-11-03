@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Docs · DL status</title>
+  <link rel="icon" href="/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="https://files.dliu.com/dliu.com/ui/v1/dl.css">
+  <link rel="stylesheet" href="https://files.dliu.com/dliu.com/ui/v1/dl-docs.css">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body class="dl-page">
+  <header class="dl-header">
+    <a class="dl-brand" href="/"><img class="dl-logo" src="/logo.svg" alt="" width="32" height="32">DL status</a>
+    <nav class="dl-nav" aria-label="Site">
+      <a class="dl-button" href="/docs" aria-current="page">Docs</a>
+    </nav>
+  </header>
+  <main class="dl-main dl-docs-main">
+    <nav class="dl-tabs" aria-label="Docs sections">
+      <a href="/docs#how" data-tab="how" aria-current="page">How it works</a>
+      <a href="/docs#checks" data-tab="checks">Every check</a>
+      <a href="/docs#cost" data-tab="cost">Cost</a>
+      <a href="/docs/health">Testing this site</a>
+    </nav>
+
+    <article class="dl-docs" id="how" data-section>
+      <h2>How it works</h2>
+      <p class="lead">Every 15 minutes, status.dliu.com visits each dliu.com site the way a guest would (no sign-in, no cookies) and
+        decides whether each of its functions is up, degraded or down.</p>
+      <figure class="dg">
+        <figcaption>One check run</figcaption>
+        <div class="dg-flow">
+          <div class="dg-step"><span class="dg-num">1</span><span class="dg-icon icon-status"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 7v5l3 2"/></svg></span><span class="dg-text"><strong>Every 15 minutes</strong><small>a scheduled Lambda starts</small></span></div>
+          <span class="dg-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+          <div class="dg-step"><span class="dg-num">2</span><span class="dg-icon icon-site"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/></svg></span><span class="dg-text"><strong>Visit as a guest</strong><small>pages and public URLs listed in each site's testing page</small></span></div>
+          <span class="dg-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+          <div class="dg-step"><span class="dg-num">3</span><span class="dg-icon icon-health"><svg viewBox="0 0 24 24"><path d="M3 12h4l2-5 4 10 2-5h6"/></svg></span><span class="dg-text"><strong>Ask /health</strong><small>the site checks its own database and storage</small></span></div>
+          <span class="dg-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+          <div class="dg-step"><span class="dg-num">4</span><span class="dg-icon icon-result"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span><span class="dg-text"><strong>Judge</strong><small>up, degraded or down for each function</small></span></div>
+          <span class="dg-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+          <div class="dg-step"><span class="dg-num">5</span><span class="dg-icon icon-data"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg></span><span class="dg-text"><strong>Publish</strong><small>this page shows the result</small></span></div>
+        </div>
+        <p class="dg-note">The checker has no sign-in and no access to the sites' data. It sees only what any visitor sees.</p>
+      </figure>
+
+      <h3>Up, degraded or down</h3>
+      <div class="dg-flow">
+        <div class="dg-step dg-good"><span class="dg-text"><strong>Up</strong><small>every check passed</small></span></div>
+        <div class="dg-step dg-warn"><span class="dg-text"><strong>Degraded</strong><small>slow (over 3 s), reported "warn", or failed once</small></span></div>
+        <div class="dg-step dg-bad"><span class="dg-text"><strong>Down</strong><small>failed two runs in a row</small></span></div>
+      </div>
+      <ul>
+        <li>A site is <strong>down</strong> when one of its essential functions is down, and <strong>degraded</strong> when any function isn't fully working (an optional one, such as Docs, being down only makes it degraded).</li>
+        <li>A failed check is tried again 2 seconds later in the same run, so one lost request doesn't count.</li>
+        <li>Availability counts degraded as available; only down time lowers it.</li>
+        <li>Private sites are checked too but not shown here.</li>
+      </ul>
+      <details>
+        <summary>Technical details</summary>
+        <ul>
+          <li>Checker: Lambda <code>Checker</code> (Node.js 22, arm64), EventBridge <code>rate(15 minutes)</code>, 90 s timeout. Each request: 10 s timeout, <code>redirect: manual</code>, no cookies, user agent <code>dliu-status-bot/1.0 (+https://status.dliu.com/docs)</code>.</li>
+          <li>Definition: <code>config/apps.json</code> in <a href="https://github.com/dliu-com/status">dliu-com/status</a>. Each site has functions, and each function has checks (URL, method, expected status, content type, body marker, JSON key or redirect target). Sites with a backend also answer <code>GET /health</code> in <code>application/health+json</code>; the contract is <code>HEALTH.md</code>.</li>
+          <li>State (failure streaks, 90 days of daily counts, the last 24 h, incidents) is kept in a private S3 bucket; the public summary is <code>/data/status.json</code>, cached for 60 s.</li>
+          <li>traffic.dliu.com drops requests with this user agent, so checks never count as visits.</li>
+        </ul>
+      </details>
+    </article>
+
+    <article class="dl-docs" id="checks" data-section hidden>
+      <h2>Every check</h2>
+      <p class="lead">What is checked on each site right now, and the latest result. Each site's own testing page explains why.</p>
+      <div id="check-list"><p class="dl-muted">Loading…</p></div>
+    </article>
+
+    <article class="dl-docs" id="cost" data-section hidden>
+      <h2>Cost</h2>
+      <p class="lead">About $0.05 a month, well under the $1 limit, because nothing runs between checks.</p>
+      <div class="dl-table-wrap">
+        <table class="dl-table">
+          <thead><tr><th>What</th><th>How much a month</th><th class="dl-num">Cost</th></tr></thead>
+          <tbody>
+            <tr><td>Checker Lambda</td><td>2,880 runs × ~5 s × 256 MB ≈ 3,600 GB-s</td><td class="dl-num">$0 (free tier; $0.06 without)</td></tr>
+            <tr><td>S3 writes and reads</td><td>~8,600 PUTs, ~2,900 GETs</td><td class="dl-num">~$0.05</td></tr>
+            <tr><td>CloudFront</td><td>the probes and this page, well inside the free 10 M requests</td><td class="dl-num">$0</td></tr>
+            <tr><td>Each site's /health</td><td>at most one backend run a minute (60 s cache), ~35,000 in total</td><td class="dl-num">&lt; $0.02</td></tr>
+            <tr><td>Logs, schedule, DNS record, certificate</td><td>small</td><td class="dl-num">~$0</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <details>
+        <summary>Why no CloudWatch metrics</summary>
+        <p>Reading Lambda and CloudFront metrics for every site every 15 minutes would cost about $2 a month with
+          GetMetricData, over the limit. The checks are instead purely what a guest sees, plus each site's own <code>/health</code>.</p>
+      </details>
+    </article>
+  </main>
+  <footer class="dl-footer">
+    <a class="dl-footer-logo" href="https://dliu.com" aria-label="dliu.com"><img src="https://files.dliu.com/dliu.com/favicon.png" alt="" width="24" height="24"></a>
+    <a href="https://dliu.com">dliu.com</a> · <a href="/docs">Docs</a>
+  </footer>
+  <script src="/docs.js" defer></script>
+</body>
+</html>

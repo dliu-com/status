@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Testing this site · DL status</title>
+  <link rel="icon" href="/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="https://files.dliu.com/dliu.com/ui/v1/dl.css">
+  <link rel="stylesheet" href="https://files.dliu.com/dliu.com/ui/v1/dl-docs.css">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body class="dl-page">
+  <header class="dl-header">
+    <a class="dl-brand" href="/"><img class="dl-logo" src="/logo.svg" alt="" width="32" height="32">DL status</a>
+    <nav class="dl-nav" aria-label="Site">
+      <a class="dl-button" href="/docs" aria-current="page">Docs</a>
+    </nav>
+  </header>
+  <main class="dl-main dl-docs-main">
+    <nav class="dl-tabs" aria-label="Docs sections">
+      <a href="/docs#how">How it works</a>
+      <a href="/docs#checks">Every check</a>
+      <a href="/docs#cost">Cost</a>
+      <a href="/docs/health" aria-current="page">Testing this site</a>
+    </nav>
+    <article class="dl-docs">
+      <h2>How to test status.dliu.com</h2>
+      <p class="lead">Two checks, both as a guest: the page opens, and the checker has run recently.</p>
+      <figure class="dg">
+        <figcaption>How a guest can tell this site is working</figcaption>
+        <div class="dg-flow">
+          <div class="dg-step"><span class="dg-num">1</span><span class="dg-icon icon-site"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/></svg></span><span class="dg-text"><strong>A guest</strong><small>no sign-in, no cookies</small></span></div>
+          <span class="dg-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+          <div class="dg-step"><span class="dg-num">2</span><span class="dg-icon icon-status"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/></svg></span><span class="dg-text"><strong>Opens the page</strong><small>the status board loads</small></span></div>
+          <span class="dg-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+          <div class="dg-step"><span class="dg-num">3</span><span class="dg-icon icon-data"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg></span><span class="dg-text"><strong>Reads the latest result</strong><small>it should be under 30 minutes old</small></span></div>
+          <span class="dg-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+          <div class="dg-step dg-good"><span class="dg-text"><strong>Working</strong><small>both are fine</small></span></div>
+        </div>
+      </figure>
+
+      <h3>Functions</h3>
+      <ul>
+        <li><strong>Status board</strong>: the page you're reading opens. If it's down, nobody can see the status.</li>
+        <li><strong>Checker</strong>: the latest result is less than 30 minutes old (checks run every 15). If it's down, the board shows old results and says so.</li>
+      </ul>
+      <details>
+        <summary>Technical details: guest checks</summary>
+        <div class="dl-table-wrap">
+          <table class="dl-table">
+            <thead><tr><th>Function</th><th>Request</th><th>Expected</th></tr></thead>
+            <tbody>
+              <tr><td><code>pages</code></td><td><code>GET https://status.dliu.com/</code></td><td><code>200</code>, <code>text/html</code>, body contains <code>dl-footer</code></td></tr>
+              <tr><td><code>checker</code></td><td><code>GET https://status.dliu.com/data/status.json</code></td><td><code>200</code>, <code>application/json</code>, <code>generatedAt</code> within the last 30 minutes</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
+
+      <h3>Not tested</h3>
+      <p>Nothing here needs a sign-in. The site has no <code>/health</code> endpoint: its only backend is the scheduled checker, which the second check covers.</p>
+      <details>
+        <summary>Technical details: why there's no /health</summary>
+        <p>The checker is a scheduled Lambda with no HTTP endpoint. <code>/data/status.json</code> is written by it at the end of every run,
+          so its <code>generatedAt</code> shows the checker ran and could write to S3. The file is cached for 60 s.</p>
+      </details>
+      <p><a href="/docs/health.md">Full technical version (Markdown)</a></p>
+    </article>
+  </main>
+  <footer class="dl-footer">
+    <a class="dl-footer-logo" href="https://dliu.com" aria-label="dliu.com"><img src="https://files.dliu.com/dliu.com/favicon.png" alt="" width="24" height="24"></a>
+    <a href="https://dliu.com">dliu.com</a> · <a href="/docs">Docs</a>
+  </footer>
+</body>
+</html>

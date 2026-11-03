@@ -1,0 +1,68 @@
+/* Status-page specifics only; header, buttons, cards, tables and colours come from dl.css. */
+/* Amber for "degraded": the shared palette has green (--dl-ok) and red (--dl-danger) but no amber. */
+:root { --status-warn: #bf8700; }
+
+.overall {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 16px;
+  margin: 0 0 24px;
+  padding: 16px 20px;
+  border: 1px solid var(--dl-line);
+  border-left: 6px solid var(--dl-line-strong);
+  border-radius: var(--dl-radius);
+  background: var(--dl-panel);
+}
+.overall p { margin: 0; }
+.overall-text { font-size: 1.25rem; font-weight: 650; }
+.overall-up { border-left-color: var(--dl-ok); }
+.overall-degraded { border-left-color: var(--status-warn); }
+.overall-down { border-left-color: var(--dl-danger); }
+
+.apps { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 560px), 1fr)); gap: 16px; }
+.app h2 { margin: 0; font-size: 1.1rem; }
+.app h2 a { color: var(--dl-text); text-decoration: none; }
+.app h2 a:hover { text-decoration: underline; }
+.app-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; }
+.app-uptime { margin-left: auto; font-size: 0.875rem; }
+.app-detail { margin: 6px 0 10px; font-size: 0.875rem; }
+
+.dot { display: inline-block; flex: none; width: 10px; height: 10px; border-radius: 50%; background: var(--dl-line-strong); }
+.dot-up { background: var(--dl-ok); }
+.dot-degraded { background: var(--status-warn); }
+.dot-down { background: var(--dl-danger); }
+
+.pill { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 0.75rem; font-weight: 650; border: 1px solid currentColor; }
+.pill-up { color: var(--dl-ok); }
+.pill-degraded { color: var(--status-warn); }
+.pill-down { color: var(--dl-danger); }
+
+.bars { display: flex; gap: 2px; height: 28px; }
+.bar { flex: 1 1 0; min-width: 2px; border-radius: 2px; background: var(--dl-line); }
+.bar-up { background: var(--dl-ok); }
+.bar-degraded { background: var(--status-warn); }
+.bar-down { background: var(--dl-danger); }
+.bars-scale { display: flex; justify-content: space-between; gap: 8px; margin-top: 4px; font-size: 0.75rem; }
+
+.functions { margin-top: 12px; }
+.functions > summary, .checks > summary { cursor: pointer; color: var(--dl-muted); font-size: 0.875rem; }
+.fn-list { list-style: none; margin: 8px 0; padding: 0; }
+.fn { padding: 8px 0; border-top: 1px solid var(--dl-line); }
+.fn-head { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
+.fn-optional { font-size: 0.75rem; }
+.fn-detail { flex-basis: 100%; padding-left: 18px; font-size: 0.875rem; }
+.checks { padding-left: 18px; margin-top: 4px; }
+.checks ul { list-style: none; margin: 6px 0 0; padding: 0; display: grid; gap: 6px; font-size: 0.8125rem; }
+.checks li { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.checks code { font-family: var(--dl-mono); }
+.how-tested { display: inline-block; margin-top: 4px; font-size: 0.875rem; }
+
+.incidents { margin-top: 32px; }
+
+/* Docs diagram icon colours (the dg-icon colour is set with --dg). */
+.dg-icon.icon-status { --dg: var(--dl-accent); }
+.dg-icon.icon-site { --dg: var(--dl-muted); }
+.dg-icon.icon-health { --dg: var(--dl-accent-hover); }
+.dg-icon.icon-data { --dg: var(--dl-ok); }
+.dg-icon.icon-result { --dg: var(--status-warn); }

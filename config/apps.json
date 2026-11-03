@@ -1,0 +1,759 @@
+{
+  "intervalMinutes": 15,
+  "defaults": {
+    "timeoutMs": 10000,
+    "slowMs": 3000,
+    "failuresBeforeDown": 2
+  },
+  "apps": [
+    {
+      "key": "root",
+      "name": "dliu.com",
+      "url": "https://dliu.com/",
+      "docs": "https://dliu.com/docs/health",
+      "health": false,
+      "functions": [
+        {
+          "key": "pages",
+          "name": "Pages",
+          "checks": [
+            {
+              "url": "https://dliu.com/",
+              "expect": {
+                "status": 200,
+                "type": "text/html",
+                "contains": "class=\"dl-header\""
+              },
+              "slowMs": 2000
+            },
+            {
+              "url": "https://dliu.com/docs",
+              "expect": {
+                "status": 200,
+                "type": "text/html",
+                "contains": "dl-docs-main"
+              },
+              "slowMs": 2000
+            },
+            {
+              "url": "https://dliu.com/style.css",
+              "expect": {
+                "status": 200,
+                "type": "text/css",
+                "contains": ".app-grid"
+              },
+              "slowMs": 2000
+            },
+            {
+              "url": "https://dliu.com/docs/health.md",
+              "expect": {
+                "status": 200,
+                "type": "text/markdown",
+                "contains": "## Guest checks"
+              },
+              "slowMs": 2000
+            }
+          ]
+        },
+        {
+          "key": "resume",
+          "name": "Résumé",
+          "critical": false,
+          "checks": [
+            {
+              "url": "https://dliu.com/resume.pdf",
+              "expect": {
+                "status": 200,
+                "type": "application/pdf",
+                "contains": "%PDF-"
+              },
+              "slowMs": 3000
+            }
+          ]
+        },
+        {
+          "key": "routing",
+          "name": "Clean URLs and 404",
+          "critical": false,
+          "checks": [
+            {
+              "url": "https://dliu.com/docs/health",
+              "expect": {
+                "status": 200,
+                "type": "text/html",
+                "contains": "id=\"functions\""
+              },
+              "slowMs": 2000
+            },
+            {
+              "url": "https://dliu.com/status-check-missing-page",
+              "expect": {
+                "status": 404,
+                "type": "text/html",
+                "contains": "Page not found"
+              },
+              "slowMs": 2000
+            }
+          ]
+        },
+        {
+          "key": "https",
+          "name": "HTTPS",
+          "critical": false,
+          "checks": [
+            {
+              "url": "http://dliu.com/",
+              "method": "HEAD",
+              "expect": {
+                "status": 301,
+                "location": "https://dliu.com/"
+              },
+              "slowMs": 2000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "video",
+      "name": "DL video",
+      "url": "https://video.dliu.com/",
+      "docs": "https://video.dliu.com/docs/health",
+      "health": false,
+      "functions": [
+        {
+          "key": "pages",
+          "name": "Pages",
+          "checks": [
+            {
+              "url": "https://video.dliu.com/",
+              "expect": {
+                "status": 200,
+                "type": "text/html",
+                "contains": "dl-footer"
+              }
+            }
+          ]
+        },
+        {
+          "key": "api",
+          "name": "Video API",
+          "checks": [
+            {
+              "url": "https://video.dliu.com/api/me",
+              "expect": {
+                "status": 401,
+                "type": "application/json"
+              }
+            }
+          ]
+        },
+        {
+          "key": "signin",
+          "name": "Microsoft sign-in",
+          "checks": [
+            {
+              "url": "https://video.dliu.com/auth/login",
+              "expect": {
+                "status": 302,
+                "location": "https://login.microsoftonline.com/"
+              }
+            }
+          ]
+        },
+        {
+          "key": "docs",
+          "name": "Docs",
+          "critical": false,
+          "checks": [
+            {
+              "url": "https://video.dliu.com/docs",
+              "expect": {
+                "status": 200,
+                "type": "text/html"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "blog",
+      "name": "DL blog",
+      "url": "https://blog.dliu.com/",
+      "docs": "https://blog.dliu.com/docs/health",
+      "health": false,
+      "functions": [
+        {
+          "key": "pages",
+          "name": "Pages",
+          "checks": [
+            {
+              "url": "https://blog.dliu.com/",
+              "expect": {
+                "status": 200,
+                "type": "text/html",
+                "contains": "dl-footer"
+              }
+            }
+          ]
+        },
+        {
+          "key": "api",
+          "name": "Blog API",
+          "checks": [
+            {
+              "url": "https://blog.dliu.com/api/me",
+              "expect": {
+                "status": 200,
+                "type": "application/json",
+                "json": "signedIn"
+              }
+            }
+          ]
+        },
+        {
+          "key": "signin",
+          "name": "Microsoft sign-in",
+          "checks": [
+            {
+              "url": "https://blog.dliu.com/auth/login",
+              "expect": {
+                "status": 302,
+                "location": "https://login.microsoftonline.com/"
+              }
+            }
+          ]
+        },
+        {
+          "key": "docs",
+          "name": "Docs",
+          "critical": false,
+          "checks": [
+            {
+              "url": "https://blog.dliu.com/docs",
+              "expect": {
+                "status": 200,
+                "type": "text/html"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "files",
+      "name": "Files",
+      "url": "https://files.dliu.com/",
+      "docs": "https://files.dliu.com/docs/health",
+      "health": false,
+      "functions": [
+        {
+          "key": "pages",
+          "name": "Pages",
+          "checks": [
+            {
+              "url": "https://files.dliu.com/",
+              "expect": {
+                "status": 200,
+                "type": "text/html",
+                "contains": "dl-footer"
+              }
+            }
+          ]
+        },
+        {
+          "key": "shared-ui",
+          "name": "Shared look for every site",
+          "checks": [
+            {
+              "url": "https://files.dliu.com/dliu.com/ui/v1/dl.css",
+              "expect": {
+                "status": 200,
+                "type": "text/css",
+                "contains": "--dl-accent"
+              }
+            },
+            {
+              "url": "https://files.dliu.com/dliu.com/favicon.png",
+              "method": "HEAD",
+              "expect": {
+                "status": 200,
+                "type": "image/png"
+              }
+            }
+          ]
+        },
+        {
+          "key": "api",
+          "name": "Files API",
+          "checks": [
+            {
+              "url": "https://files.dliu.com/api/files",
+              "expect": {
+                "status": 401,
+                "type": "application/json"
+              }
+            }
+          ]
+        },
+        {
+          "key": "signin",
+          "name": "Microsoft sign-in",
+          "checks": [
+            {
+              "url": "https://files.dliu.com/auth/login",
+              "expect": {
+                "status": 302,
+                "location": "https://login.microsoftonline.com/"
+              }
+            }
+          ]
+        },
+        {
+          "key": "docs",
+          "name": "Docs",
+          "critical": false,
+          "checks": [
+            {
+              "url": "https://files.dliu.com/docs",
+              "expect": {
+                "status": 200,
+                "type": "text/html"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "share",
+      "name": "DL Share",
+      "url": "https://share.dliu.com/",
+      "docs": "https://share.dliu.com/docs/health",
+      "health": false,
+      "functions": [
+        {
+          "key": "pages",
+          "name": "Pages",
+          "checks": [
+            {
+              "url": "https://share.dliu.com/",
+              "expect": {
+                "status": 200,
+                "type": "text/html",
+                "contains": "dl-footer"
+              }
+            }
+          ]
+        },
+        {
+          "key": "api",
+          "name": "Sharing API",
+          "checks": [
+            {
+              "url": "https://share.dliu.com/api/me",
+              "expect": {
+                "status": 401,
+                "type": "application/json"
+              }
+            }
+          ]
+        },
+        {
+          "key": "signin",
+          "name": "Microsoft sign-in",
+          "checks": [
+            {
+              "url": "https://share.dliu.com/auth/login",
+              "expect": {
+                "status": 302,
+                "location": "https://login.microsoftonline.com/"
+              }
+            }
+          ]
+        },
+        {
+          "key": "docs",
+          "name": "Docs",
+          "critical": false,
+          "checks": [
+            {
+              "url": "https://share.dliu.com/docs",
+              "expect": {
+                "status": 200,
+                "type": "text/html"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "traffic",
+      "name": "Traffic",
+      "url": "https://traffic.dliu.com/",
+      "docs": "https://traffic.dliu.com/docs/health",
+      "health": false,
+      "functions": [
+        {
+          "key": "pages",
+          "name": "Dashboard pages",
+          "checks": [
+            {
+              "url": "https://traffic.dliu.com/",
+              "expect": {
+                "status": 200,
+                "type": "text/html",
+                "contains": "dl-footer"
+              }
+            }
+          ]
+        },
+        {
+          "key": "page-script",
+          "name": "Page script",
+          "critical": false,
+          "checks": [
+            {
+              "url": "https://traffic.dliu.com/t/s.js",
+              "expect": {
+                "status": 200,
+                "type": "application/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "key": "api",
+          "name": "Dashboard API",
+          "checks": [
+            {
+              "url": "https://traffic.dliu.com/api/me",
+              "expect": {
+                "status": 401,
+                "type": "application/json"
+              }
+            }
+          ]
+        },
+        {
+          "key": "signin",
+          "name": "Microsoft sign-in",
+          "checks": [
+            {
+              "url": "https://traffic.dliu.com/auth/login",
+              "expect": {
+                "status": 302,
+                "location": "https://login.microsoftonline.com/"
+              }
+            }
+          ]
+        },
+        {
+          "key": "docs",
+          "name": "Docs",
+          "critical": false,
+          "checks": [
+            {
+              "url": "https://traffic.dliu.com/docs",
+              "expect": {
+                "status": 200,
+                "type": "text/html"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "plan",
+      "name": "DL Travel Plan",
+      "url": "https://plan.dliu.com/",
+      "docs": "https://plan.dliu.com/docs/health",
+      "health": false,
+      "functions": [
+        {
+          "key": "pages",
+          "name": "Pages",
+          "checks": [
+            {
+              "url": "https://plan.dliu.com/",
+              "expect": {
+                "status": 200,
+                "type": "text/html",
+                "contains": "dl-footer"
+              }
+            }
+          ]
+        },
+        {
+          "key": "api",
+          "name": "Trip API",
+          "checks": [
+            {
+              "url": "https://plan.dliu.com/api/me",
+              "expect": {
+                "status": 200,
+                "type": "application/json",
+                "json": "signedIn"
+              }
+            }
+          ]
+        },
+        {
+          "key": "signin",
+          "name": "Microsoft sign-in",
+          "checks": [
+            {
+              "url": "https://plan.dliu.com/auth/login",
+              "expect": {
+                "status": 302,
+                "location": "https://login.microsoftonline.com/"
+              }
+            }
+          ]
+        },
+        {
+          "key": "docs",
+          "name": "Docs",
+          "critical": false,
+          "checks": [
+            {
+              "url": "https://plan.dliu.com/docs",
+              "expect": {
+                "status": 200,
+                "type": "text/html"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "auth",
+      "name": "DL auth",
+      "url": "https://auth.dliu.com/",
+      "docs": "https://auth.dliu.com/docs/health",
+      "health": false,
+      "functions": [
+        {
+          "key": "pages",
+          "name": "Pages",
+          "checks": [
+            {
+              "url": "https://auth.dliu.com/",
+              "expect": {
+                "status": 200,
+                "type": "text/html",
+                "contains": "dl-footer"
+              }
+            },
+            {
+              "url": "https://auth.dliu.com/redirect.html",
+              "expect": {
+                "status": 200,
+                "type": "text/html",
+                "contains": "</html>"
+              }
+            }
+          ]
+        },
+        {
+          "key": "docs",
+          "name": "Docs",
+          "critical": false,
+          "checks": [
+            {
+              "url": "https://auth.dliu.com/docs",
+              "expect": {
+                "status": 200,
+                "type": "text/html"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "jh",
+      "name": "jh.dliu.com",
+      "url": "https://jh.dliu.com/",
+      "docs": "https://jh.dliu.com/docs/health",
+      "private": true,
+      "health": false,
+      "functions": [
+        {
+          "key": "pages",
+          "name": "Pages",
+          "checks": [
+            {
+              "url": "https://jh.dliu.com/",
+              "expect": {
+                "status": 200,
+                "type": "text/html",
+                "contains": "dl-footer"
+              }
+            }
+          ]
+        },
+        {
+          "key": "public",
+          "name": "Guest photos",
+          "checks": [
+            {
+              "url": "https://jh.dliu.com/api/public",
+              "expect": {
+                "status": 200,
+                "type": "application/json",
+                "json": "photos"
+              }
+            }
+          ]
+        },
+        {
+          "key": "api",
+          "name": "API",
+          "checks": [
+            {
+              "url": "https://jh.dliu.com/api/me",
+              "expect": {
+                "status": 200,
+                "type": "application/json"
+              }
+            }
+          ]
+        },
+        {
+          "key": "signin",
+          "name": "Microsoft sign-in",
+          "checks": [
+            {
+              "url": "https://jh.dliu.com/auth/login",
+              "expect": {
+                "status": 302,
+                "location": "https://login.microsoftonline.com/"
+              }
+            }
+          ]
+        },
+        {
+          "key": "docs",
+          "name": "Docs",
+          "critical": false,
+          "checks": [
+            {
+              "url": "https://jh.dliu.com/docs",
+              "expect": {
+                "status": 200,
+                "type": "text/html"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "weiqi",
+      "name": "DL Weiqi",
+      "url": "https://weiqi.dliu.com/",
+      "docs": "https://weiqi.dliu.com/docs/health",
+      "health": false,
+      "functions": [
+        {
+          "key": "pages",
+          "name": "Pages",
+          "checks": [
+            {
+              "url": "https://weiqi.dliu.com/",
+              "expect": {
+                "status": 200,
+                "type": "text/html",
+                "contains": "dl-footer"
+              }
+            }
+          ]
+        },
+        {
+          "key": "games",
+          "name": "Game API",
+          "checks": [
+            {
+              "url": "https://weiqi.dliu.com/api/games",
+              "expect": {
+                "status": 200,
+                "type": "application/json",
+                "json": "games"
+              }
+            }
+          ]
+        },
+        {
+          "key": "docs",
+          "name": "Docs",
+          "critical": false,
+          "checks": [
+            {
+              "url": "https://weiqi.dliu.com/docs",
+              "expect": {
+                "status": 200,
+                "type": "text/html"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "xiangqi",
+      "name": "DL Xiangqi",
+      "url": "https://xiangqi.dliu.com/",
+      "docs": "https://xiangqi.dliu.com/docs/health",
+      "health": false,
+      "functions": [
+        {
+          "key": "pages",
+          "name": "Pages",
+          "checks": [
+            {
+              "url": "https://xiangqi.dliu.com/",
+              "expect": {
+                "status": 200,
+                "type": "text/html",
+                "contains": "dl-footer"
+              }
+            }
+          ]
+        },
+        {
+          "key": "game",
+          "name": "Game API",
+          "checks": [
+            {
+              "url": "https://xiangqi.dliu.com/api/game",
+              "expect": {
+                "status": 200,
+                "type": "application/json",
+                "json": "state"
+              }
+            }
+          ]
+        },
+        {
+          "key": "docs",
+          "name": "Docs",
+          "critical": false,
+          "checks": [
+            {
+              "url": "https://xiangqi.dliu.com/docs",
+              "expect": {
+                "status": 200,
+                "type": "text/html"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
