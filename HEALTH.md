@@ -6,12 +6,13 @@ site. The status checker is an anonymous guest: it never signs in and has no AWS
 The testing interface is separate from the site's managed API (`/docs/api`, which is for signed-in users changing
 content). They share no routes and no credentials.
 
-## 1. Testing instructions (every site): `/docs/health` for people, `/docs/health.md` for machines
+## 1. Testing instructions (every site): `/docs#health` for people, `/docs/health.md` for machines
 
 The same content in two forms, kept in sync:
 
-**`/docs/health`: an HTML page for people.** It sits next to the site's other docs pages and uses the shared docs look
-(`dl.css`, `dl-docs.css`, `dl-tabs`, and the `dg-*` diagram kit). Someone who isn't technical should understand it at a
+**`/docs#health`: a tab for people.** It's a tab named *Testing* (`#health`) on the site's `/docs` page, next to its
+other tabs (Technical architecture, Cost, Security…), with the shared docs look (`dl.css`, `dl-docs.css`, `dl-tabs`,
+and the `dg-*` diagram kit). The old `/docs/health` URL answers `301` with `Location: /docs#health`. Someone who isn't technical should understand it at a
 glance:
 
 - A **diagram** of how the site is tested: status.dliu.com, as a guest, → the site's pages and public URLs → (if there
@@ -71,7 +72,7 @@ ones listed on `/docs/health`.
 
 ## 3. Tests in the site's repo
 
-A test that fails if `/docs/health`, `/docs/health.md` or `/health` disappears, if `/health` starts reading cookies or
+A test that fails if the `/docs#health` tab, the `/docs/health` → `/docs#health` redirect, `/docs/health.md` or `/health` disappears, if `/health` starts reading cookies or
 the `Authorization` header, if the page loses its diagram or its technical details stop being folded, or if the
 function keys in the page, the Markdown file and the endpoint drift apart.
 
