@@ -14,8 +14,9 @@ The same content in two forms, kept in sync:
 other tabs (Technical architecture, Cost, Security…), with the shared docs look (`dl.css`, `dl-docs.css`, `dl-tabs`,
 and the `dg-*` diagram kit). The old `/docs/health` URL answers `301` with `Location: /docs#health`.
 
-It is for someone who isn't technical, so it shows rather than tells, and has **no technical details at all**: no
-URLs, methods, status codes, headers, content types, JSON or code, not even folded away. Use:
+It is for someone who isn't technical, so it shows rather than tells. **High-level technical details are fine**, such
+as which endpoint or page is tested (`/health`, `/api/me`, the home page); **exact ones are not**: no status codes,
+headers, content types, body markers, JSON or code, and no folded `<details>` blocks. Use:
 
 - **Flows**: how a test run goes, step by step (status.dliu.com visits as a guest → the site's pages and functions →
   the site checks its own storage → working / slow / not working), with the `dg-flow`, `dg-step` and `dg-arrow`
@@ -75,8 +76,8 @@ ones listed in the `/docs#health` tab and `/docs/health.md`.
 ## 3. Tests in the site's repo
 
 A test that fails if the `/docs#health` tab, the `/docs/health` → `/docs#health` redirect, `/docs/health.md` or `/health` disappears, if `/health` starts reading cookies or
-the `Authorization` header, if the tab loses its diagram or gains technical details (URLs, status codes, `<code>`,
-`<details>`), or if the functions in the tab, the Markdown file and the endpoint drift apart.
+the `Authorization` header, if the tab loses its diagram or gains exact technical details (status codes, JSON,
+`<details>` blocks), or if the functions in the tab, the Markdown file and the endpoint drift apart.
 
 ## How status.dliu.com uses it
 
