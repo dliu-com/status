@@ -640,7 +640,7 @@
       "name": "DL Travel Plan",
       "url": "https://plan.dliu.com/",
       "docs": "https://plan.dliu.com/docs/health",
-      "health": false,
+      "health": true,
       "functions": [
         {
           "key": "pages",
@@ -651,23 +651,43 @@
               "expect": {
                 "status": 200,
                 "type": "text/html",
-                "contains": "dl-footer"
-              }
+                "contains": "class=\"dl-header\""
+              },
+              "slowMs": 2000
+            },
+            {
+              "url": "https://plan.dliu.com/docs",
+              "expect": {
+                "status": 200,
+                "type": "text/html",
+                "contains": "class=\"dl-footer\""
+              },
+              "slowMs": 2000
             }
           ]
         },
         {
-          "key": "api",
-          "name": "Trip API",
+          "key": "docs",
+          "name": "Docs",
+          "critical": false,
           "checks": [
             {
-              "url": "https://plan.dliu.com/api/me",
+              "url": "https://plan.dliu.com/docs/api.md",
               "expect": {
                 "status": 200,
-                "type": "application/json",
-                "json": "signedIn"
+                "type": "text/markdown",
+                "contains": "# Travel plan API"
               },
-              "slowMs": 5000
+              "slowMs": 2000
+            },
+            {
+              "url": "https://plan.dliu.com/docs/health.md",
+              "expect": {
+                "status": 200,
+                "type": "text/markdown",
+                "contains": "# plan.dliu.com health checks"
+              },
+              "slowMs": 2000
             }
           ]
         },
@@ -681,21 +701,58 @@
                 "status": 302,
                 "location": "https://login.microsoftonline.com/"
               },
-              "slowMs": 5000
+              "slowMs": 3000
+            },
+            {
+              "url": "https://plan.dliu.com/api/me",
+              "expect": {
+                "status": 200,
+                "type": "application/json",
+                "contains": "\"signedIn\":false"
+              },
+              "slowMs": 3000
             }
           ]
         },
         {
-          "key": "docs",
-          "name": "Docs",
+          "key": "private",
+          "name": "Privacy gate",
+          "checks": [
+            {
+              "url": "https://plan.dliu.com/api/trips",
+              "expect": {
+                "status": 401,
+                "type": "application/json",
+                "json": "error"
+              },
+              "slowMs": 3000
+            }
+          ]
+        },
+        {
+          "key": "trips",
+          "name": "Travel plan storage",
+          "checks": []
+        },
+        {
+          "key": "files",
+          "name": "Attachment storage",
+          "critical": false,
+          "checks": []
+        },
+        {
+          "key": "pdf",
+          "name": "PDF export",
           "critical": false,
           "checks": [
             {
-              "url": "https://plan.dliu.com/docs",
+              "url": "https://plan.dliu.com/api/trips/health/pdf",
               "expect": {
-                "status": 200,
-                "type": "text/html"
-              }
+                "status": 404,
+                "type": "application/json",
+                "json": "error"
+              },
+              "slowMs": 3000
             }
           ]
         }
