@@ -21,10 +21,21 @@ function ago(iso) {
   return t(`${Math.round(hours / 24)} 天前`, `${Math.round(hours / 24)} days ago`);
 }
 
-// Times are shown in the visitor's own time zone, with its name (e.g. "4 Nov 2026, 00:30 GMT").
-const when = (iso) => new Date(iso).toLocaleString(locale, {
-  year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', timeZoneName: 'short',
-});
+// Times are shown in the visitor's own time zone, with its offset: "2026-11-03 23:59 UTC+8".
+function utcOffset(date) {
+  const minutes = -date.getTimezoneOffset();
+  if (!minutes) return 'UTC';
+  const sign = minutes > 0 ? '+' : '-';
+  const hours = Math.floor(Math.abs(minutes) / 60);
+  const rest = Math.abs(minutes) % 60;
+  return `UTC${sign}${hours}${rest ? `:${String(rest).padStart(2, '0')}` : ''}`;
+}
+
+function when(iso) {
+  const date = new Date(iso);
+  const pad = (n) => String(n).padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())} ${utcOffset(date)}`;
+}
 const percent = (value) => (value == null ? t('无数据', 'no data') : `${value.toFixed(value === 100 ? 0 : 2)} %`);
 
 function pill(status) {
@@ -37,10 +48,12 @@ function dayBar(day) {
   if (total) tone = day.down ? 'down' : day.degraded ? 'degraded' : 'up';
   const bar = el('span', `bar bar-${tone}`);
   const available = total && percent(((total - day.down) / total) * 100);
+  // Days are counted in UTC by the checker, so the date says so.
+  const date = t(`${day.date}（UTC）`, `${day.date} (UTC)`);
   bar.title = total
-    ? t(`${day.date}：可用率 ${available}（共 ${total} 次检查，故障 ${day.down} 次，降级 ${day.degraded} 次）`,
-      `${day.date}: ${available} available (${day.down} down, ${day.degraded} degraded of ${total} checks)`)
-    : t(`${day.date}：无数据`, `${day.date}: no data`);
+    ? t(`${date}：可用率 ${available}（共 ${total} 次检查，故障 ${day.down} 次，降级 ${day.degraded} 次）`,
+      `${date}: ${available} available (${day.down} down, ${day.degraded} degraded of ${total} checks)`)
+    : t(`${date}：无数据`, `${date}: no data`);
   return bar;
 }
 
@@ -101,7 +114,7 @@ function renderApp(app, locations) {
   scale.append(
     el('span', null, t('90 天前', '90 days ago')),
     el('span', null, t(`24 小时：${percent(app.uptime.d1)} · 7 天：${percent(app.uptime.d7)}`, `24 h: ${percent(app.uptime.d1)} · 7 days: ${percent(app.uptime.d7)}`)),
-    el('span', null, t('今天', 'Today')),
+    el('span', null, t('今天（UTC）', 'Today (UTC)')),
   );
   card.append(scale);
 
