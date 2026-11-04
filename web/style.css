@@ -38,8 +38,9 @@
 .pill-degraded { color: var(--status-warn); }
 .pill-down { color: var(--dl-danger); }
 
-.bars { display: flex; gap: 2px; height: 28px; }
-.bar { flex: 1 1 0; min-width: 2px; border-radius: 2px; background: var(--dl-line); }
+.bars { display: flex; gap: 2px; height: 28px; min-width: 0; }
+.bar { flex: 1 1 0; min-width: 0; border-radius: 2px; background: var(--dl-line); }
+@media (max-width: 600px) { .bars { gap: 1px; } .bar { border-radius: 1px; } }
 .bar-up { background: var(--dl-ok); }
 .bar-degraded { background: var(--status-warn); }
 .bar-down { background: var(--dl-danger); }
