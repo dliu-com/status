@@ -21,7 +21,10 @@ function ago(iso) {
   return t(`${Math.round(hours / 24)} 天前`, `${Math.round(hours / 24)} days ago`);
 }
 
-const when = (iso) => new Date(iso).toLocaleString(locale, { dateStyle: 'medium', timeStyle: 'short' });
+// Times are shown in the visitor's own time zone, with its name (e.g. "4 Nov 2026, 00:30 GMT").
+const when = (iso) => new Date(iso).toLocaleString(locale, {
+  year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', timeZoneName: 'short',
+});
 const percent = (value) => (value == null ? t('无数据', 'no data') : `${value.toFixed(value === 100 ? 0 : 2)} %`);
 
 function pill(status) {
@@ -152,8 +155,8 @@ function renderOverall(data) {
   const locations = data.locations || [];
   const places = joinNames(locations.map((l) => (l.everyMinutes ? `${name(l.name)}${t('（每小时）', ' (hourly)')}` : name(l.name))));
   meta.textContent = t(
-    `以访客身份${places ? `从${places}` : ''}每 ${data.intervalMinutes} 分钟检查一次 · 上次检查：${ago(data.generatedAt)}`,
-    `Checked every ${data.intervalMinutes} minutes as a guest${places ? ` from ${places}` : ''} · last check ${ago(data.generatedAt)}`,
+    `以访客身份${places ? `从${places}` : ''}每 ${data.intervalMinutes} 分钟检查一次 · 上次检查：${ago(data.generatedAt)}（${when(data.generatedAt)}）`,
+    `Checked every ${data.intervalMinutes} minutes as a guest${places ? ` from ${places}` : ''} · last check ${ago(data.generatedAt)} (${when(data.generatedAt)})`,
   );
   const missing = locations.filter((l) => !l.ran);
   if (missing.length) {
