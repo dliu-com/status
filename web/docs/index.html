@@ -30,6 +30,19 @@
       <p class="lead">Every 15 minutes, status.dliu.com visits each dliu.com site the way a guest would (no sign-in, no cookies)
         from Ireland, Virginia (US) and Tokyo, plus once an hour from inside mainland China, and decides whether each of its
         functions is up, degraded or down.</p>
+      <figure class="dg dg-tiers">
+      <figcaption>Components</figcaption>
+      <div class="dg-tier dg-untrusted"><div class="dg-tier-label"><span class="dg-badge">Browser</span><strong>People</strong></div><div class="dg-tier-nodes"><div class="dg-node"><span class="dg-icon svc-people" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c.8-3.5 3-5 6-5s5.2 1.5 6 5M15 15c2.5 0 4.6 1.3 5.5 4"/></svg></span><span class="dg-text"><strong>Visitors</strong><small>Read the status page; no account</small></span></div></div></div>
+      <div class="dg-link"><span class="dg-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span><span>HTTPS, status.dliu.com</span></div>
+      <div class="dg-tier dg-edge"><div class="dg-tier-label"><span class="dg-badge">Edge</span><strong>CloudFront</strong></div><div class="dg-tier-nodes"><div class="dg-node"><span class="dg-icon svc-cloudfront" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg></span><span class="dg-text"><strong>Distribution</strong><small>Serves the page and the latest result; caches it 60 s</small></span></div><div class="dg-node"><span class="dg-icon svc-cloudfront" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/></svg></span><span class="dg-text"><strong>Routes function</strong><small>/docs, and the old /docs/health link</small></span></div></div></div>
+      <div class="dg-link"><span class="dg-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span><span>the page and result come from</span></div>
+      <div class="dg-tier dg-private"><div class="dg-tier-label"><span class="dg-badge">Private</span><strong>AWS account</strong></div><div class="dg-tier-nodes"><div class="dg-node"><span class="dg-icon svc-s3" aria-hidden="true"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="7" ry="2.5"/><path d="M5 6l1.5 13c.2 1.2 2.6 2 5.5 2s5.3-.8 5.5-2L19 6"/></svg></span><span class="dg-text"><strong>Site bucket</strong><small>The pages and /data/status.json</small></span></div><div class="dg-node"><span class="dg-icon svc-s3" aria-hidden="true"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="7" ry="2.5"/><path d="M5 6l1.5 13c.2 1.2 2.6 2 5.5 2s5.3-.8 5.5-2L19 6"/></svg></span><span class="dg-text"><strong>State bucket</strong><small>Streaks, 90 days of history, incidents; never served</small></span></div></div></div>
+      <div class="dg-link"><span class="dg-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span><span>written every 15 minutes by</span></div>
+      <div class="dg-tier dg-app"><div class="dg-tier-label"><span class="dg-badge">On demand</span><strong>Checks</strong></div><div class="dg-tier-nodes"><div class="dg-node"><span class="dg-icon svc-status" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 7v5l3 2"/></svg></span><span class="dg-text"><strong>Schedule</strong><small>Every 15 minutes</small></span></div><div class="dg-node"><span class="dg-icon svc-lambda" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 4h3l7 16h3M12.5 12 7 20"/></svg></span><span class="dg-text"><strong>Checker (Ireland)</strong><small>Checks, combines, judges, publishes</small></span></div><div class="dg-node"><span class="dg-icon svc-lambda" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 4h3l7 16h3M12.5 12 7 20"/></svg></span><span class="dg-text"><strong>Probes (Virginia, Tokyo)</strong><small>The same checks from there</small></span></div><div class="dg-node"><span class="dg-icon svc-china" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></svg></span><span class="dg-text"><strong>China (Globalping)</strong><small>Two probes, hourly</small></span></div></div></div>
+      <div class="dg-link"><span class="dg-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span><span>as a guest, to every dliu.com site</span></div>
+      <div class="dg-tier dg-untrusted"><div class="dg-tier-label"><span class="dg-badge">Internet</span><strong>dliu.com sites</strong></div><div class="dg-tier-nodes"><div class="dg-node"><span class="dg-icon svc-people" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg></span><span class="dg-text"><strong>11 sites</strong><small>Their pages, public endpoints and /health</small></span></div></div></div>
+      </figure>
+
       <figure class="dg">
         <figcaption>One check run</figcaption>
         <div class="dg-flow">
@@ -158,6 +171,7 @@
     </article>
     <article class="dl-docs" id="health" data-section hidden>
       <h2>Health</h2>
+      <p class="dl-muted">Machine-readable version: <a href="/docs/health.md">/docs/health.md</a></p>
       <p class="lead">How anyone can tell that status.dliu.com itself is working: the page opens, and its latest result is fresh.</p>
       <div class="dg-stats">
         <div class="dg-stat"><span class="dg-icon icon-result"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span><span class="dg-text"><strong>2 functions</strong><small>the status board and the checker</small></span></div>
@@ -165,23 +179,23 @@
         <div class="dg-stat"><span class="dg-icon icon-status"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 7v5l3 2"/></svg></span><span class="dg-text"><strong>30 minutes</strong><small>the oldest a result may be</small></span></div>
         <div class="dg-stat"><span class="dg-icon icon-health"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span><span class="dg-text"><strong>0 sign-ins</strong><small>nothing here needs one</small></span></div>
       </div>
-      <figure class="dg">
-        <figcaption>How a guest can tell this site is working</figcaption>
-        <div class="dg-flow">
-          <div class="dg-step"><span class="dg-num">1</span><span class="dg-icon icon-site"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/></svg></span><span class="dg-text"><strong>A guest</strong><small>no sign-in, no cookies</small></span></div>
-          <span class="dg-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
-          <div class="dg-step"><span class="dg-num">2</span><span class="dg-icon icon-status"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/></svg></span><span class="dg-text"><strong>Opens the home page</strong><small>the status board loads</small></span></div>
-          <span class="dg-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
-          <div class="dg-step"><span class="dg-num">3</span><span class="dg-icon icon-data"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg></span><span class="dg-text"><strong>Reads the latest result</strong><small>written by the checker at the end of every run</small></span></div>
-          <span class="dg-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
-          <div class="dg-step"><span class="dg-num">4</span><span class="dg-icon icon-result"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 7v5l3 2"/></svg></span><span class="dg-text"><strong>Is it fresh?</strong><small>under 30 minutes old</small></span></div>
-        </div>
+      <figure class="dg dg-tiers">
+        <figcaption>How status.dliu.com is tested</figcaption>
+        <div class="dg-tier dg-untrusted"><div class="dg-tier-label"><span class="dg-badge">Guest</span><strong>Anyone</strong></div><div class="dg-tier-nodes"><div class="dg-node"><span class="dg-icon svc-people" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c.8-3.5 3-5 6-5s5.2 1.5 6 5M15 15c2.5 0 4.6 1.3 5.5 4"/></svg></span><span class="dg-text"><strong>A visitor</strong><small>Opens the page; no sign-in, no cookies</small></span></div><div class="dg-node"><span class="dg-icon svc-status" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 12h4l2-5 4 10 2-5h6"/></svg></span><span class="dg-text"><strong>Another monitor</strong><small>Can read the latest result the same way</small></span></div></div></div>
+        <div class="dg-link"><span class="dg-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span><span>HTTPS, status.dliu.com</span></div>
+        <div class="dg-tier dg-edge"><div class="dg-tier-label"><span class="dg-badge">Edge</span><strong>CloudFront</strong></div><div class="dg-tier-nodes"><div class="dg-node"><span class="dg-icon svc-cloudfront" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/></svg></span><span class="dg-text"><strong>Status board</strong><small>The home page: tested by opening it</small></span></div><div class="dg-node"><span class="dg-icon svc-cloudfront" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg></span><span class="dg-text"><strong>Latest result</strong><small>/data/status.json: tested by checking it is under 30 minutes old</small></span></div></div></div>
+        <div class="dg-link"><span class="dg-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span><span>the result is written at the end of every run by</span></div>
+        <div class="dg-tier dg-app"><div class="dg-tier-label"><span class="dg-badge">On demand</span><strong>Checker</strong></div><div class="dg-tier-nodes"><div class="dg-node"><span class="dg-icon svc-lambda" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 4h3l7 16h3M12.5 12 7 20"/></svg></span><span class="dg-text"><strong>Checker</strong><small>Runs every 15 minutes in Ireland</small></span></div><div class="dg-node"><span class="dg-icon svc-lambda" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 4h3l7 16h3M12.5 12 7 20"/></svg></span><span class="dg-text"><strong>Probes</strong><small>Virginia and Tokyo, every 15 minutes</small></span></div><div class="dg-node"><span class="dg-icon svc-china" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></svg></span><span class="dg-text"><strong>China</strong><small>Two volunteer probes, hourly</small></span></div></div></div>
+        <div class="dg-link"><span class="dg-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span><span>keeps its memory in</span></div>
+        <div class="dg-tier dg-private"><div class="dg-tier-label"><span class="dg-badge">Private</span><strong>Storage</strong></div><div class="dg-tier-nodes"><div class="dg-node"><span class="dg-icon svc-s3" aria-hidden="true"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="7" ry="2.5"/><path d="M5 6l1.5 13c.2 1.2 2.6 2 5.5 2s5.3-.8 5.5-2L19 6"/></svg></span><span class="dg-text"><strong>State</strong><small>Failure streaks, 90 days of history, incidents</small></span></div></div></div>
+        </figure>
+      <div class="dg">
         <div class="dg-flow results">
           <div class="dg-step dg-good"><span class="dg-text"><strong>Working</strong><small>the page opens and the result is fresh</small></span></div>
           <div class="dg-step dg-warn"><span class="dg-text"><strong>Out of date</strong><small>the page opens, but the checker has stopped</small></span></div>
           <div class="dg-step dg-bad"><span class="dg-text"><strong>Not working</strong><small>the page doesn't open</small></span></div>
         </div>
-      </figure>
+      </div>
 
       <h3>What is tested</h3>
       <div class="dl-table-wrap">

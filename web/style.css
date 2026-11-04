@@ -63,7 +63,14 @@
 
 .incidents { margin-top: 32px; }
 
-/* Docs diagram icon colours (the dg-icon colour is set with --dg). */
+/* Docs diagram icon colours (the dg-icon colour is set with --dg), matching the other sites' Architecture diagrams:
+   AWS service colours, which the shared palette doesn't cover. */
+.dg-icon.svc-people { --dg: #805719; }
+.dg-icon.svc-status { --dg: var(--dl-accent); }
+.dg-icon.svc-cloudfront { --dg: #8c4fff; }
+.dg-icon.svc-lambda { --dg: #ed7100; }
+.dg-icon.svc-s3 { --dg: #7aa116; }
+.dg-icon.svc-china { --dg: var(--dl-danger); }
 .dg-icon.icon-status { --dg: var(--dl-accent); }
 .dg-icon.icon-site { --dg: var(--dl-muted); }
 .dg-icon.icon-health { --dg: var(--dl-accent-hover); }

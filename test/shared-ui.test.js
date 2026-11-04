@@ -44,11 +44,15 @@ test('the Health tab is for people: diagram, numbers and a table, no exact techn
   const full = read('docs/index.html');
   const start = full.indexOf('id="health" data-section');
   const page = full.slice(start, full.indexOf('</article>', start));
-  expect(page).toContain('class="dg-flow"');
+  expect(page).toContain('<figure class="dg dg-tiers">');
+  expect(page).toContain('class="dg-tier dg-');
+  expect(page).toContain('class="dg-link"');
   expect(page).toContain('class="dg-stats"');
+  expect(page.indexOf('<a href="/docs/health.md">')).toBeLessThan(page.indexOf('<figure'));
   expect(page).toContain('<table class="dl-table">');
   expect(page).not.toMatch(/<details|<code|<pre|\b[1-5]\d\d\b(?! minutes)|application\/|text\/html|https?:\/\/(?!status)/);
   expect(page).toContain('<a href="/docs/health.md">Technical version for machines (Markdown)</a>');
+  expect(page).not.toMatch(/style="/);
   const markdown = read('docs/health.md');
   for (const key of ['`pages`', '`checker`', 'https://status.dliu.com/data/status.json', 'generatedAt']) expect(markdown).toContain(key);
 });
