@@ -18,6 +18,26 @@ It is for someone who isn't technical, so it shows rather than tells. **High-lev
 as which endpoint or page is tested (`/health`, `/api/me`, the home page); **exact ones are not**: no status codes,
 headers, content types, body markers, JSON or code, and no folded `<details>` blocks. Use:
 
+- **Diagrams in the same style as the Architecture tab's "Components" diagram** (see https://video.dliu.com/docs#architecture):
+  big numbers with coloured service icons, and tiers of components joined by labelled arrows:
+
+  ```html
+  <div class="dg-stats"><div class="dg-stat"><span class="dg-icon" style="--dg:#2e8540">…svg…</span><span class="dg-text"><strong>6 functions</strong><small>tested as a guest</small></span></div>…</div>
+  <figure class="dg dg-tiers">
+    <figcaption>How the site is tested</figcaption>
+    <div class="dg-tier dg-untrusted"><div class="dg-tier-label"><span class="dg-badge">Guest</span><strong>Testers</strong></div>
+      <div class="dg-tier-nodes"><div class="dg-node"><span class="dg-icon" style="--dg:#209cee">…svg…</span><span class="dg-text"><strong>status.dliu.com</strong><small>Ireland, Virginia, Tokyo every 15 min; China hourly</small></span></div>…</div></div>
+    <div class="dg-link"><span class="dg-arrow">…svg…</span><span>HTTPS, no sign-in</span></div>
+    <div class="dg-tier dg-edge">…pages and endpoints tested…</div>
+    <div class="dg-link">…</div>
+    <div class="dg-tier dg-app">…/health and the backend…</div>
+    <div class="dg-link">…</div>
+    <div class="dg-tier dg-private">…storage it reads (database, buckets, settings)…</div>
+  </figure>
+  ```
+
+  Use the same colours and icons as the site's Architecture diagram for the same services (the `--dg` colour may be
+  set by the docs script, as the Architecture diagrams do, since the CSP forbids inline styles in HTML).
 - **Flows**: how a test run goes, step by step (status.dliu.com visits as a guest → the site's pages and functions →
   the site checks its own storage → working / slow / not working), with the `dg-flow`, `dg-step` and `dg-arrow`
   classes and `dg-good`, `dg-warn` and `dg-bad` for the outcomes.
