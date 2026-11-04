@@ -47,7 +47,9 @@ headers, content types, body markers, JSON or code, and no folded `<details>` bl
   would notice if it stopped working, with a working / not working mark.
 - **Charts**: for example how many checks each function has, or what is tested versus what a guest can't test.
 - A short **not tested** list in plain words (signed-in actions such as uploads and edits).
-- One link at the end: "Technical version for machines (Markdown)" → `/docs/health.md`.
+- A link to the Markdown file **at the beginning**, right under the tab's heading (for example "Machine-readable version:
+  /docs/health.md"), and again at the end: "Technical version for machines (Markdown)" → `/docs/health.md`. The API tab
+  does the same for `/docs/api.md`.
 
 **`/docs/health.md`: a Markdown file for machines and AI agents.** It's served as `text/markdown; charset=utf-8`, contains
 the full text with every technical detail unfolded, and is enough on its own to implement the tests:
