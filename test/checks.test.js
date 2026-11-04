@@ -50,13 +50,13 @@ test('accepts the expected redirect and the expected 401', async () => {
 });
 
 test('checks exact JSON values and patterns without echoing them', async () => {
-  const body = '{"configured":true,"tenantId":"d6229c1d-85e4-4a28-bd67-6c14b995fcae"}';
+  const body = '{"configured":true,"tenantId":"12345678-1234-4123-8123-123456789abc"}';
   const result = await runHttpCheck({ url: 'https://a.dliu.com/config.json', expect: { status: 200, jsonEquals: { configured: true }, jsonPattern: { tenantId: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$' } } },
     defaults, opts(async () => reply(200, { type: 'application/json', body })));
   expect(result.status).toBe('pass');
   const bad = await runHttpCheck({ url: 'https://a.dliu.com/config.json', expect: { status: 200, jsonPattern: { tenantId: '^x$' } } },
     defaults, opts(async () => reply(200, { type: 'application/json', body })));
-  expect(bad.detail).not.toContain('d6229c1d');
+  expect(bad.detail).not.toContain('12345678-1234');
 });
 
 test('retries a failure once in the same run', async () => {
