@@ -3,7 +3,8 @@
 const TABS = ['architecture', 'checks', 'cost', 'security', 'health'];
 // Old links: /docs#how was the first tab's name.
 const ALIASES = { how: 'architecture' };
-const STATUS_LABELS = { up: 'Up', degraded: 'Degraded', down: 'Down' };
+const { t, name, detail } = window.dlI18n;
+const STATUS_LABELS = { up: t('正常', 'Up'), degraded: t('降级', 'Degraded'), down: t('故障', 'Down') };
 
 function el(tag, className, text) {
   const node = document.createElement(tag);
@@ -31,14 +32,14 @@ async function loadChecks() {
     target.replaceChildren();
     for (const app of data.apps) {
       const heading = el('h3');
-      const link = el('a', null, app.name);
+      const link = el('a', null, name(app.name));
       link.href = app.docs;
       heading.append(el('span', `dot dot-${app.status}`), ' ', link);
       target.append(heading);
       const wrap = el('div', 'dl-table-wrap');
       const table = el('table', 'dl-table');
       const head = el('tr');
-      for (const title of ['Function', 'Check', 'Latest result']) head.append(el('th', null, title));
+      for (const title of [t('功能', 'Function'), t('检查', 'Check'), t('最新结果', 'Latest result')]) head.append(el('th', null, title));
       table.append(el('thead'));
       table.tHead.append(head);
       const body = el('tbody');
@@ -46,13 +47,13 @@ async function loadChecks() {
         fn.checks.forEach((check, index) => {
           const row = el('tr');
           if (index === 0) {
-            const cell = el('td', null, `${fn.name}${fn.critical ? '' : ' (optional)'}`);
+            const cell = el('td', null, `${name(fn.name)}${fn.critical ? '' : t('（可选）', ' (optional)')}`);
             cell.rowSpan = fn.checks.length;
             row.append(cell);
           }
-          const name = el('td');
-          name.append(el('code', null, check.name));
-          row.append(name, el('td', null, `${STATUS_LABELS[{ pass: 'up', warn: 'degraded', fail: 'down' }[check.status]]}: ${check.detail}`));
+          const checkCell = el('td');
+          checkCell.append(el('code', null, check.name));
+          row.append(checkCell, el('td', null, `${STATUS_LABELS[{ pass: 'up', warn: 'degraded', fail: 'down' }[check.status]]}${t('：', ': ')}${detail(check.detail)}`));
           body.append(row);
         });
       }
@@ -61,7 +62,7 @@ async function loadChecks() {
       target.append(wrap);
     }
   } catch {
-    target.replaceChildren(el('p', 'dl-error', 'The checks could not be loaded. Try again in a minute.'));
+    target.replaceChildren(el('p', 'dl-error', t('无法载入检查结果，请稍后再试。', 'The checks could not be loaded. Try again in a minute.')));
   }
 }
 
