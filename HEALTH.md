@@ -10,7 +10,7 @@ content). They share no routes and no credentials.
 
 The same content in two forms, kept in sync:
 
-**`/docs#health`: a tab for people.** It's a tab named *Testing* (`#health`) on the site's `/docs` page, next to its
+**`/docs#health`: a tab for people.** It's a tab named *Health* (`#health`) on the site's `/docs` page, next to its
 other tabs (Technical architecture, Cost, Security…), with the shared docs look (`dl.css`, `dl-docs.css`, `dl-tabs`,
 and the `dg-*` diagram kit). The old `/docs/health` URL answers `301` with `Location: /docs#health`.
 

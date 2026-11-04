@@ -1,3 +1,5 @@
+import * as crypto from 'crypto';
+import * as fs from 'fs';
 import * as path from 'path';
 import { Construct } from 'constructs';
 import {
@@ -43,6 +45,32 @@ function handler(event) {
   return request;
 }
 `;
+
+// Pages link their own scripts and styles as /<file>?v=<content hash>, so a new page never runs with a stale cached
+// script (scripts are cached for 5 minutes, and browsers may keep using the old copy while they fetch the new one).
+export function versionedPage(html: string, webDir: string): string {
+  return html.replace(/(src|href)="\/([\w./-]+\.(?:js|css))"/g, (match, attribute, file) => {
+    const full = path.join(webDir, file);
+    if (!fs.existsSync(full)) return match;
+    const hash = crypto.createHash('sha256').update(fs.readFileSync(full)).digest('hex').slice(0, 10);
+    return `${attribute}="/${file}?v=${hash}"`;
+  });
+}
+
+export function sitePages(webDir: string): s3deploy.ISource[] {
+  const pages: s3deploy.ISource[] = [];
+  const walk = (dir: string) => {
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const full = path.join(dir, entry.name);
+      if (entry.isDirectory()) walk(full);
+      else if (entry.name.endsWith('.html')) {
+        pages.push(s3deploy.Source.data(path.relative(webDir, full), versionedPage(fs.readFileSync(full, 'utf8'), webDir)));
+      }
+    }
+  };
+  walk(webDir);
+  return pages;
+}
 
 export interface StatusStackProps extends StackProps {
   subdomain?: string;
@@ -212,7 +240,7 @@ export class StatusStack extends Stack {
     });
     // HTML pages stay no-cache, so a deploy shows on the next load.
     new s3deploy.BucketDeployment(this, 'SitePages', {
-      sources: [s3deploy.Source.asset(path.join(ROOT, 'web'))],
+      sources: sitePages(path.join(ROOT, 'web')),
       destinationBucket: siteBucket,
       exclude: ['*', DATA_PREFIX],
       include: SITE_PAGES,

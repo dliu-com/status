@@ -1,7 +1,7 @@
 # Testing status.dliu.com
 
 Machine-readable testing instructions for status.dliu.com, following the dliu.com health contract
-(https://github.com/dliu-com/status/blob/master/HEALTH.md). The human version is the Testing tab, https://status.dliu.com/docs#health.
+(https://github.com/dliu-com/status/blob/master/HEALTH.md). The human version is the Health tab, https://status.dliu.com/docs#health.
 
 ## Functions
 

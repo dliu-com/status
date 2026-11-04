@@ -5,6 +5,7 @@ const fs = require('fs');
 const { runHttpCheck, runHealthCheck } = require('./checks');
 const { judgeApp, recordRun, buildPublic } = require('./evaluate');
 const { mergeLocations } = require('./locations');
+const { probeChina } = require('./globalping');
 
 const STATE_KEY = 'state.json';
 const PUBLIC_KEY = 'data/status.json';
@@ -83,22 +84,51 @@ async function readState(s3, GetObjectCommand, bucket) {
 // Probe in Virginia and Tokyo: run the checks here and hand back the raw results.
 exports.probe = async () => ({ raw: await probeAll(loadConfig()) });
 
+// China's last results, reused until its next run (it runs hourly), so a China-only problem doesn't come and go.
+async function chinaResults(config, state, now, options) {
+  const location = config.locations.find((l) => l.provider === 'globalping');
+  if (!location) return { china: null, raw: null };
+  const every = location.everyMinutes * 60000;
+  const last = state.china;
+  // A few minutes' slack, so the run nearest each hour mark always qualifies.
+  if (last && now - Date.parse(last.at) < every - 5 * 60000) return { location, china: last, raw: last.raw };
+  try {
+    const raw = await probeChina(config, location, options);
+    const china = { at: new Date(now).toISOString(), raw };
+    return { location, china, raw };
+  } catch (error) {
+    console.error(JSON.stringify({ probe: location.key, error: error.message }));
+    // Keep the last results for one more period, then show China as not checked.
+    const usable = last && now - Date.parse(last.at) < 2 * every;
+    return { location, china: usable ? last : null, raw: usable ? last.raw : null };
+  }
+}
+
 // Ireland: run the checks here, collect the other locations, merge, judge and publish.
 exports.handler = async () => {
   const { S3Client, GetObjectCommand, PutObjectCommand } = require('@aws-sdk/client-s3');
   const s3 = new S3Client({});
   const config = loadConfig();
-  const [home, ...remote] = config.locations;
+  const [home, ...remote] = config.locations.filter((l) => l.region);
   const state = await readState(s3, GetObjectCommand, process.env.STATE_BUCKET);
-  const raws = await Promise.all([
+  const started = Date.now();
+  const [china, ...raws] = await Promise.all([
+    chinaResults(config, state, started),
     probeAll(config).then((raw) => ({ location: home, raw })),
     ...remote.map((location) => invokeProbe(location).then((raw) => ({ location, raw }))),
   ]);
+  if (china.location) raws.push({ location: china.location, raw: china.raw });
   const results = judgeAll(config, mergeLocations(config.apps, raws), state.streaks || {});
   const now = Date.now();
   const next = recordRun(state, results, now);
+  next.china = china.china || undefined;
   const view = buildPublic(config, next, results, now);
-  view.locations = raws.map(({ location, raw }) => ({ key: location.key, name: location.name, ran: Boolean(raw) }));
+  view.locations = raws.map(({ location, raw }) => ({
+    key: location.key,
+    name: location.name,
+    ran: Boolean(raw),
+    ...(location.everyMinutes ? { everyMinutes: location.everyMinutes, at: china.china?.at } : {}),
+  }));
   await s3.send(new PutObjectCommand({
     Bucket: process.env.STATE_BUCKET,
     Key: STATE_KEY,
@@ -119,6 +149,7 @@ exports.handler = async () => {
 };
 
 exports.runChecks = runChecks;
+exports.chinaResults = chinaResults;
 exports.probeAll = probeAll;
 exports.loadConfig = loadConfig;
 exports.PROBE_FUNCTION = PROBE_FUNCTION;

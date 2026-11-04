@@ -1,6 +1,7 @@
 import { App } from 'aws-cdk-lib';
 import { Match, Template } from 'aws-cdk-lib/assertions';
-import { ROUTES_FUNCTION_CODE, StatusStack } from '../lib/status-stack';
+import * as path from 'path';
+import { ROUTES_FUNCTION_CODE, StatusStack, sitePages, versionedPage } from '../lib/status-stack';
 import { ProbeStack } from '../lib/probe-stack';
 import { LOCATIONS } from '../lib/checker-code';
 
@@ -62,4 +63,14 @@ test('the docs routes map /docs to its file and redirect the old testing page to
   expect(handler({ request: { uri: '/docs/health' } })).toEqual({ statusCode: 301, statusDescription: 'Moved Permanently', headers: { location: { value: '/docs#health' } } });
   expect(route('/docs/health.md')).toBe('/docs/health.md');
   expect(route('/data/status.json')).toBe('/data/status.json');
+});
+
+test('pages link their scripts and styles with a content hash, so a new page never runs a stale script', () => {
+  const web = path.join(__dirname, '..', 'web');
+  const page = versionedPage('<link rel="stylesheet" href="/style.css"><script src="/app.js" defer></script><img src="/logo.svg"><a href="/docs">', web);
+  expect(page).toMatch(/href="\/style\.css\?v=[0-9a-f]{10}"/);
+  expect(page).toMatch(/src="\/app\.js\?v=[0-9a-f]{10}"/);
+  expect(page).toContain('src="/logo.svg"');
+  expect(page).toContain('href="/docs"');
+  expect(sitePages(web)).toHaveLength(3);
 });

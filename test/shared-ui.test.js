@@ -30,9 +30,9 @@ test('docs pages use the shared docs stylesheet and tabs', () => {
   }
 });
 
-test('the docs have Technical architecture, Every check, Cost, Security and Testing tabs', () => {
+test('the docs have Architecture, Every check, Cost, Security and Health tabs', () => {
   const page = read('docs/index.html');
-  for (const [id, label] of [['architecture', 'Architecture'], ['checks', 'Every check'], ['cost', 'Cost'], ['security', 'Security'], ['health', 'Testing']]) {
+  for (const [id, label] of [['architecture', 'Architecture'], ['checks', 'Every check'], ['cost', 'Cost'], ['security', 'Security'], ['health', 'Health']]) {
     expect(page).toContain(`<a href="/docs#${id}" data-tab="${id}"`);
     expect(page).toContain(`>${label}</a>`);
     expect(page).toContain(`id="${id}" data-section`);
@@ -40,7 +40,7 @@ test('the docs have Technical architecture, Every check, Cost, Security and Test
   expect(fs.existsSync(path.join(__dirname, '..', 'web', 'docs', 'health.html'))).toBe(false);
 });
 
-test('the testing tab is for people: diagram, numbers and a table, no exact technical details, a link to the Markdown', () => {
+test('the Health tab is for people: diagram, numbers and a table, no exact technical details, a link to the Markdown', () => {
   const full = read('docs/index.html');
   const start = full.indexOf('id="health" data-section');
   const page = full.slice(start, full.indexOf('</article>', start));

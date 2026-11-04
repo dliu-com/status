@@ -5,9 +5,13 @@ test('runs every 15 minutes with sane defaults', () => {
   expect(config.defaults).toEqual({ timeoutMs: 10000, slowMs: 3000, failuresBeforeDown: 2 });
 });
 
-test('locations: Ireland first (the checker), then the probes', () => {
-  expect(config.locations.map((l) => l.key)).toEqual(['ie', 'us', 'jp']);
+test('locations: Ireland first (the checker), then the AWS probes, then China hourly through Globalping', () => {
+  expect(config.locations.map((l) => l.key)).toEqual(['ie', 'us', 'jp', 'cn']);
   expect(config.locations[0].region).toBe('eu-west-1');
+  const china = config.locations[3];
+  expect(china).toMatchObject({ provider: 'globalping', everyMinutes: 60 });
+  expect(china).not.toHaveProperty('region');
+  expect(china.probes.length).toBe(2);
 });
 
 test('every site has a key, name, https URL, testing page and functions with checks', () => {

@@ -56,6 +56,8 @@ function renderFunction(fn, locations) {
       const where = el('span', 'locations');
       for (const location of locations) {
         const result = check.locations[location.key];
+        // Hourly locations (China) only run a few checks; leave them out where they didn't.
+        if (!result && location.everyMinutes) continue;
         const tone = !result ? 'none' : result.status === 'pass' ? 'up' : result.status === 'warn' ? 'degraded' : 'down';
         const item = el('span', 'location');
         item.title = result ? `${location.name}: ${result.detail}` : `${location.name}: did not run`;
@@ -142,7 +144,7 @@ function renderOverall(data) {
   else text.textContent = `${degraded} ${degraded === 1 ? 'site has' : 'sites have'} a problem`;
   const stale = Date.now() - Date.parse(data.generatedAt) > (data.intervalMinutes * 2 + 5) * 60000;
   const locations = data.locations || [];
-  const from = locations.length ? ` from ${listNames(locations.map((l) => l.name))}` : '';
+  const from = locations.length ? ` from ${listNames(locations.map((l) => (l.everyMinutes ? `${l.name} (hourly)` : l.name)))}` : '';
   meta.textContent = `Checked every ${data.intervalMinutes} minutes as a guest${from} · last check ${ago(data.generatedAt)}`;
   const missing = locations.filter((l) => !l.ran);
   if (missing.length) meta.append(el('span', null, ` · ${listNames(missing.map((l) => l.name))} couldn't check this time`));

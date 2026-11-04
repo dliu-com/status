@@ -5,11 +5,15 @@ which sites and which of their functions are up, degraded or down, with 90 days 
 
 - **Guest only.** The checker never signs in and has no AWS access to the other sites. It requests public URLs over HTTPS,
   without cookies, like any visitor, plus each site's public `/health` endpoint.
-- **Each site says how to test it.** Every site publishes a Testing tab, `/docs#health` (for people: a diagram, technical details
+- **Each site says how to test it.** Every site publishes a Health tab, `/docs#health` (for people: a diagram, technical details
   folded), and `/docs/health.md` (for machines: every detail). `config/apps.json` here is written from those pages. The
   contract every site follows is [`HEALTH.md`](HEALTH.md).
+- **Four locations.** Ireland (the checker), Virginia and Tokyo (probe Lambdas) every 15 minutes, and mainland China
+  hourly through [Globalping](https://globalping.io) (free, no account; 2 probes on China Telecom and China Unicom; each
+  site's home page and `/health` only, about 40 tests an hour against the free 250). A check fails when most locations
+  fail it; failing from one location only makes it degraded.
 - **Not counted as traffic.** Every request uses the user agent `dliu-status-bot/1.0 (+https://status.dliu.com/docs)`,
-  which traffic.dliu.com drops.
+  which traffic.dliu.com drops (and Globalping's `globalping probe …`).
 - **Cost:** about $0.05 a month (limit: $1). See `/docs#cost`.
 
 ```
@@ -76,5 +80,5 @@ make outputs
 | `lambda/checker/evaluate.js` | Up/degraded/down rules, history, incidents, the public file |
 | `lambda/checker/index.js` | Lambda handler: reads state, runs checks, writes state and `data/status.json` |
 | `lib/status-stack.ts` | CDK: private buckets, checker + schedule, CloudFront, certificate, DNS |
-| `web/` | The status board, `/docs` (tabs: Technical architecture, Every check, Cost, Security, Testing) and `/docs/health.md` |
+| `web/` | The status board, `/docs` (tabs: Architecture, Every check, Cost, Security, Health) and `/docs/health.md` |
 | `HEALTH.md` | The testing contract every dliu.com site follows |

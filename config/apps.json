@@ -15,6 +15,21 @@
       "key": "jp",
       "name": "Tokyo",
       "region": "ap-northeast-1"
+    },
+    {
+      "key": "cn",
+      "name": "China",
+      "provider": "globalping",
+      "everyMinutes": 60,
+      "slowMs": 6000,
+      "probes": [
+        {
+          "magic": "China Telecom"
+        },
+        {
+          "magic": "China Unicom"
+        }
+      ]
     }
   ],
   "defaults": {

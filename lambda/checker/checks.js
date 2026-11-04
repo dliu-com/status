@@ -99,6 +99,29 @@ async function runHttpCheck(check, defaults, { fetchImpl = fetch, retryDelayMs =
 
 const HEALTH_STATUSES = new Set(['pass', 'warn', 'fail']);
 
+// Reads a /health answer (HEALTH.md format) into its functions, or an error saying what's wrong with it.
+function parseHealthBody(text) {
+  let body;
+  try {
+    body = JSON.parse(text);
+  } catch {
+    return { error: '/health did not return JSON' };
+  }
+  if (!body || !HEALTH_STATUSES.has(body.status) || !Array.isArray(body.functions)) {
+    return { error: '/health answer is not in the agreed format' };
+  }
+  return {
+    functions: body.functions
+      .filter((fn) => fn && typeof fn.key === 'string' && HEALTH_STATUSES.has(fn.status))
+      .map((fn) => ({
+        key: fn.key,
+        name: typeof fn.name === 'string' ? fn.name.slice(0, 80) : fn.key,
+        status: fn.status,
+        output: typeof fn.output === 'string' ? fn.output.slice(0, 120) : '',
+      })),
+  };
+}
+
 // GET <site>/health (HEALTH.md). Returns the endpoint's own result and the functions it reports.
 async function runHealthCheck(url, defaults, { fetchImpl = fetch, retryDelayMs = 2000 } = {}) {
   const attempt = async () => {
@@ -116,23 +139,15 @@ async function runHealthCheck(url, defaults, { fetchImpl = fetch, retryDelayMs =
     }
     const ms = Date.now() - started;
     if (![200, 503].includes(response.status)) return { status: 'fail', detail: `/health answered HTTP ${response.status}`, ms, functions: [] };
-    let body;
+    let text;
     try {
-      body = JSON.parse(await readBody(response));
+      text = await readBody(response);
     } catch {
       return { status: 'fail', detail: '/health did not return JSON', ms, functions: [] };
     }
-    if (!body || !HEALTH_STATUSES.has(body.status) || !Array.isArray(body.functions)) {
-      return { status: 'fail', detail: '/health answer is not in the agreed format', ms, functions: [] };
-    }
-    const functions = body.functions
-      .filter((fn) => fn && typeof fn.key === 'string' && HEALTH_STATUSES.has(fn.status))
-      .map((fn) => ({
-        key: fn.key,
-        name: typeof fn.name === 'string' ? fn.name.slice(0, 80) : fn.key,
-        status: fn.status,
-        output: typeof fn.output === 'string' ? fn.output.slice(0, 120) : '',
-      }));
+    const parsed = parseHealthBody(text);
+    if (parsed.error) return { status: 'fail', detail: parsed.error, ms, functions: [] };
+    const { functions } = parsed;
     const slow = ms > defaults.slowMs;
     return { status: slow ? 'warn' : 'pass', detail: slow ? `Slow: ${seconds(ms)}` : `Answered in ${seconds(ms)}`, ms, functions };
   };
@@ -142,4 +157,4 @@ async function runHealthCheck(url, defaults, { fetchImpl = fetch, retryDelayMs =
   return attempt();
 }
 
-module.exports = { USER_AGENT, checkName, runHttpCheck, runHealthCheck };
+module.exports = { USER_AGENT, checkName, runHttpCheck, runHealthCheck, parseHealthBody, seconds };

@@ -32,5 +32,7 @@ export interface Location {
   region: string;
 }
 
-export const LOCATIONS: Location[] = JSON.parse(fs.readFileSync(path.join(ROOT, 'config', 'apps.json'), 'utf8')).locations;
+// The AWS locations (Ireland, Virginia, Tokyo). China runs through Globalping and needs no AWS resources.
+export const LOCATIONS: Location[] = JSON.parse(fs.readFileSync(path.join(ROOT, 'config', 'apps.json'), 'utf8'))
+  .locations.filter((l: Partial<Location>) => l.region);
 export const PROBE_FUNCTION_NAME = 'dliu-status-probe';
